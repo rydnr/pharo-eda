@@ -1,13 +1,13 @@
---
+---
 title: Pharo EDA
---
+---
 
 # Event-Driven Architectures in Pharo
 
 PharoEDA is a framework that simplifies developing Event-Driven Architectures [1].
 It's also an opinionated framework favoring Domain-Driven Design [2], which means that if you honor some conventions, and the adapters are available, PharoEDA will let you focus in your domain and only in your domain. It works out-of-the-box. Please read on even if your programming language of choice is not Pharo Smalltalk [3].
 
-## It works Out-of-the-box
+## How it works out-of-the-box
 
 Before dealing with technical details and configuration settings, let us show what this framework does for you.
 Imagine you have your Pharo-EDA microservice up and running. It receives commands, does whatever it needs to do, and
@@ -16,7 +16,7 @@ Now imagine after an Event-Storming session, a new event is identified: ~user cr
 
 With PharoEDA, to support this new event and command, you'd need:
 - Define the command envelope
-```javascript
+```json
 {
   'meta': {
     'type': 'CREATE_USER'
@@ -28,7 +28,7 @@ With PharoEDA, to support this new event and command, you'd need:
 }
 ```
 - Define a sample event
-```javascript
+```json
 {
   'meta': {
     'type': USER_CREATED'
