@@ -1,3 +1,7 @@
+--
+title: Pharo EDA
+--
+
 # Event-Driven Architectures in Pharo
 
 PharoEDA is a framework that simplifies developing Event-Driven Architectures [1].
