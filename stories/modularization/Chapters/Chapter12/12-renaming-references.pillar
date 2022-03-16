@@ -1,0 +1,3 @@
+! Renaming references
+
+We are now able to copy classes from one package in a module, to a different package in a different module. However, since the classes can be renamed in the process, we need to make sure references get updated too.

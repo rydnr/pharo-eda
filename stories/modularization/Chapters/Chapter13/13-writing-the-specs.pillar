@@ -1,0 +1,185 @@
+! Writing the specs
+
+Finally we can profit from our modularization. Recall our journey started with a problem statement: automate copying and renaming classes from pharo-eda develop, to the new pharo-eda modules.
+
+The specification format was defined in Chapter04:
+
+[[[
+input package,input class,output module,output package,output class
+]]]
+
+[[[
+EDA-Commands,EDACommand,pharo-eda-api,EDAAPI-Commands,EDAAPI-Commands,EDACommand
+EDA-Commands,EDADeleteAggregateCommand,pharo-eda-api,EDAAPI-Commands,EDAAPI-Commands,EDADeleteAggregateCommand
+EDA-Commands,EDAUserCommand,pharo-eda-api,EDAAPI-Commands,EDAAPI-Commands,EDAUserCommand
+EDA-Commands,EDACommandError,pharo-eda-api,EDAAPI-Commands,EDAAPI-Commands,EDACommandError
+EDA-Commands,EDATooManyAggregatesForCriteria,EDAAPI-Commands,EDAAPI-Commands,EDATooManyAggregatesForCriteria
+EDA-Commands-Tests,RegexJson,pharo-eda,EDA-Commands-Tests,EDA-Commands-Tests,EDARegexJson
+EDA-Commands-Tests,RegexJsonArray,pharo-eda,EDA-Commands-Tests,EDARegexJsonArray
+EDA-Commands-Tests,RegexJsonDictionary,pharo-eda,EDA-Commands-Tests,EDA-Commands-Tests,EDARegexJsonDictionary
+EDA-Commands-Tests,EDATestSettings,pharo-eda-settings,EDAS-Settings-Tests,EDAS-Settings-Tests,EDASTestSettings
+EDA-Domain,EDAAggregateRepository,pharo-eda-api,EDAAPI-Aggregates,EDAAPI-Aggregates,EDAAggregateRepository
+EDA-Domain,EDAAggregateRoot,pharo-eda-api,EDAAPI-Aggregates,EDAAPI-Aggregates,EDAAggregateRoot
+EDA-Domain,EDADomainException,pharo-eda-api,EDAAPI-Exceptions,EDAAPI-Exceptions,EDADomainException
+EDA-Domain,EDAAggregateRootDoesNotExist,pharo-eda-api,EDAAPI-Exceptions,EDAAPI-Exceptions,EDAAggregateRootDoesNotExist
+EDA-Domain,EDAAlreadyExistingAggregate,pharo-eda-api,EDAAPI-Exceptions,EDAAPI-Exceptions,EDAAlreadyExistingAggregate
+EDA-Domain,MissingDeleteEventClassForAggregate,pharo-eda-api,EDAAPI-Exceptions,EDAAPI-Exceptions,EDAMissingDeleteEventClassForAggregate
+EDA-Domain,TooManyDeleteEventClassesForAggregate,pharo-eda-api,EDAAPI-Exceptions,EDAAPI-Exceptions,EDATooManyDeleteEventClassesForAggregate
+EDA-Domain,InvalidTenant,pharo-eda-api,EDAAPI-Exceptions,EDAAPI-Exceptions,EDAInvalidTenant
+EDA-Domain-Tests,EDAAcceptEverything,pharo-eda,EDA-TestSupport,EDA-TestSupport,EDAAcceptEverything
+EDA-Domain-Tests,EDATDomainBDD,pharo-eda,EDA-TestSupport,EDA-TestSupport,EDATDomainBDD
+EDA-Domain-Tests,EDATTestEvent,pharo-eda,EDA-TestSupport,EDA-TestSupport,EDATestEvent
+EDA-Domain-Tests,EDATestAggregateRoot,pharo-eda,EDA-TestSupport,EDA-TestSupport,EDATestAggregateRoot
+EDA-Domain-Tests,EDATestEventStub,pharo-eda,EDA-TestSupport,EDA-TestSupport,EDATestEventStub
+EDA-Domain-Tests,EDAVolatileEventStore,pharo-eda,EDA-TestSupport,EDA-TestSupport,EDAVolatileEventStore
+EDA-Errors,EDAErrorBehavior,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAEErrorBehavior
+EDA-Errors,EDACommandConsumingErrorBehavior,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAECommandConsumingErrorBehavior
+EDA-Errors,EDAProjectionErrorBehavior,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAEProjectionErrorBehavior
+EDA-Errors,EDAErrorHandlingStrategy,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAEErrorHandlingStrategy
+EDA-Errors,EDAJustLogErrorStrategy,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAEJustLogErrorStrategy
+EDA-Errors,EDALaunchDebuggerErrorStrategy,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAELaunchDebuggerErrorStrategy
+EDA-Errors,EDAPublishMessageErrorStrategy,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAEPublishMessageErrorStrategy
+EDA-Errors,EDAThrowError,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAEThrowErrorErrorStrategy
+EDA-Errors,EDAJsonErrorSerializer,pharo-eda-errors,EDAE-Domain,EDAE-Domain-Behaviors,EDAEJsonErrorSerializer
+EDA-EventStore,EDAEventStore,pharo-eda-ports,EDAP-EventStore,EDAP-EventStore,EDAPEventStore
+EDA-Events,EDAEventSourcingEvent,pharo-eda-api,EDAAPI-Events,EDAAPI-Events,EDAEventSourcingEvent
+EDA-Events,EDACommandResultEvent,pharo-eda-api,EDAAPI-Events,EDAAPI-Events,EDACommandResultEvent
+EDA-Events,EDADeleteCommandResultEvent,pharo-eda-api,EDAAPI-Events,EDAAPI-Events,EDADeleteCommandResultEvent
+EDA-Events,EDAUserCommandResultEvent,pharo-eda-api,EDAAPI-Events,EDAAPI-Events,EDAUserCommandResultEvent
+EDA-Events,EDAVersionedEvent,pharo-eda-api,EDAAPI-Events,EDAAPI-Events,EDAVersionedEvent
+EDA-Logging,EDALogEvent,pharo-eda-api,EDAAPI-Logging,EDAAPI-Logging,EDALogEvent
+EDA-Logging,InvalidLoggingLevel,pharo-eda-common,EDAC-Logging,EDAC-Logging,EDACInvalidLoggingLevel
+EDA-Messaging,EDACommandConsumer,pharo-eda-ports,EDAP-Messaging,EDAP-Messaging-Command,EDAPCommandConsumer
+EDA-Messaging,EDAEventProducer,pharo-eda-ports,EDAP-Messaging,EDAP-Messaging-Event,EDAPEventProducer
+EDA-Messaging,EDAMessageSerializer,pharo-eda-common,EDAC-Messaging,EDAC-Messaging,EDACMessageSerializer
+EDA-Messaging,EDATopicListener,pharo-eda-ports,EDAP-Messaging,EDAP-Messaging-Topic,EDAPTopicListener
+EDA-Messaging,EDATopicPublisher,pharo-eda-ports,EDAP-Messaging,EDAP-Messaging-Topic,EDAPTopicPublisher
+EDA-Multimodule-Migration,EDAMMClassDefinitionWrapper,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMClassDefinitionWrapper
+EDA-Multimodule-Migration,EDAMMClassFile,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMClassFile
+EDA-Multimodule-Migration,EDAMMCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMCommandHandler
+EDA-Multimodule-Migration,EDAMMClassFileCategoryOverwritingCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMClassFileCategoryOverwritingCommandHandler
+EDA-Multimodule-Migration,EDAMMClassFileReaderCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMClassFileReaderCommandHandler
+EDA-Multimodule-Migration,EDAMMClassFileWriterCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMClassFileWriterCommandHandler
+EDA-Multimodule-Migration,EDAMMCompositeCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMCompositeCommandHandler
+EDA-Multimodule-Migration,EDAMMConfigurationCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMConfigurationCommandHandler
+EDA-Multimodule-Migration,EDAMMLoggingCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMLoggingCommandHandler
+EDA-Multimodule-Migration,EDAMMSpecIteratorCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMSpecIteratorCommandHandler
+EDA-Multimodule-Migration,EDAMMSpecReaderCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMSpecReaderCommandHandler
+EDA-Multimodule-Migration,EDAMMMigrationTool,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMMigrationTool
+EDA-Multimodule-Migration,EDAMMModuleFile,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMModuleFile
+EDA-Multimodule-Migration,EDAMMSpecFile,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration,EDATMMSpecFile
+EDA-Multimodule-Migration-Tests,EDAMMClassFileCategoryOverwritingCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMClassFileCategoryOverwritingCommandHandlerTest
+EDA-Multimodule-Migration-Tests,EDAMMClassFileReaderCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMClassFileReaderCommandHandlerTest
+EDA-Multimodule-Migration-Tests,EDAMMClassFileTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMClassFileTest
+EDA-Multimodule-Migration-Tests,EDAMMClassFileWriterCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMClassFileWriterCommandHandlerTest
+EDA-Multimodule-Migration-Tests,EDAMMCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMCommandHandlerTest
+EDA-Multimodule-Migration-Tests,EDAMMCompositeCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMCompositeCommandHandlerTest
+EDA-Multimodule-Migration-Tests,EDAMMConfigurationCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMConfigurationCommandHandlerTest
+EDA-Multimodule-Migration-Tests,EDAMMDummyCommandHandler,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMDummyCommandHandler
+EDA-Multimodule-Migration-Tests,EDAMMMigrationToolTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMMigrationToolTest
+EDA-Multimodule-Migration-Tests,EDAMMModuleFileTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMModuleFileTest
+EDA-Multimodule-Migration-Tests,EDAMMSpecFileTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMSpecFileTest
+EDA-Multimodule-Migration-Tests,EDAMMSpecIteratorCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMSpecIteratorCommandHandlerTest
+EDA-Multimodule-Migration-Tests,EDAMMSpecReaderCommandHandlerTest,pharo-eda-tools,EDAT-Tools,EDAT-Tools-Migration-Tests,EDATMMSpecReaderCommandHandlerTest
+EDA-Projections,EDAProjection,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Views,EDAProjection
+EDA-Projections,EDAProjectionLogEvent,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Events,EDAProjectionLogEvent
+EDA-Projections,EDAEventNotProjected,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Events,EDAEventNotProjected
+EDA-Projections,EDAEventProjected,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Events,EDAEventProjected
+EDA-Projections,EDAProjectionRemoved,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Events,EDAProjectionRemoved
+EDA-Projections,EDAProjectionSynchronizationChecked,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Events,EDAProjectionSynchronizationChecked
+EDA-Projections,EDAProjectionRepository,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Repositories,EDAProjectionRepository
+EDA-Projections,EDAProjector,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Projectors,EDAProjector
+EDA-Projections,EDACompositeProjector,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Projectors,EDACompositeProjector
+EDA-Projections,EDAMultipleProjectionsPerProjector,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Projectors,EDAMultipleProjectionsPerProjector
+EDA-Projections,EDASingleProjectionPerEventProjector,pharo-eda-api,EDAAPI-Projections,EDAAPI-Projections-Projectors,EDASingleProjectionPerEventProjector
+EDA-Projections-Voyage-Repository,EDAProjectionVoyageRepository,pharo-eda-adapters,EDAA-Projections-Voyage,EDAA-Projections-Voyage,EDAAProjectionVoyageRepository
+EDA-Projections-Voyage-Repository,EDAProjectionMemoryRepository,pharo-eda-adapters,EDAA-Projections-Voyage,EDAA-Projections-Voyage,EDAAProjectionMemoryRepository
+EDA-Projections-Voyage-Repository,EDAProjectionMongoRepository,pharo-eda-adapters,EDAA-Projections-Voyage,EDAA-Projections-Voyage,EDAAProjectionMongoRepository
+EDA-Projections-Voyage-Repository,EDAVOProjectionMongoRepository,pharo-eda-adapters,EDAA-Projections-Voyage,EDAA-Projections-Voyage,EDAAVOProjectionMongoRepository
+EDA-SMTP,EDASmtpClient,pharo-eda-adapters,EDAA-SMTP,EDAA-SMTP,EDAASmtpClient
+EDA-Settings,EDADUEnvironment,pharo-eda,EDA-Application,EDA-Application,EDADUEnvironment
+EDA-Settings,EDASettings,pharo-eda-settings,EDA-Settings,EDA-Settings,EDASSettings
+EDA-StompMessaging,EDAStompTopicListener,pharo-eda-adapters,EDAA-Messaging-Stomp,EDAA-Messaging-Stomp,EDAAStompTopicListener
+EDA-StompMessaging,EDACommandStompTopicListener,pharo-eda-adapters,EDAA-Messaging-Stomp,EDAA-Messaging-Stomp,EDAACommandStompTopicListener
+EDA-StompMessaging,EDAStompTopicPublisher,pharo-eda-adapters,EDAA-Messaging-Stomp,EDAA-Messaging-Stomp,EDAAStompTopicPublisher
+EDA-StompMessaging,EDAEventStompTopicPublisher,pharo-eda-adapters,EDAA-Messaging-Stomp,EDAA-Messaging-Stomp,EDAAEventStompTopicPublisher
+EDA-Tools,AbstractEDAGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATAbstractGenerator
+EDA-Tools,EDAAggregateContractCheckerGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATAggregateContractCheckerGenerator
+EDA-Tools,EDACommandContractCheckerGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATCommandContractCheckerGenerator
+EDA-Tools,EDAEventContractCheckerGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATEventContractCheckerGenerator
+EDA-Tools,EDAGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATGenerator
+EDA-Tools,EDAAggregateGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATAggregateGenerator
+EDA-Tools,EDAApplicationGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATApplicationGenerator
+EDA-Tools,EDACommandGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATCommandGenerator
+EDA-Tools,EDACompositeGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATCompositeGenerator
+EDA-Tools,EDADefaultCommandBuilderGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATDefaultCommandBuilderGenerator
+EDA-Tools,EDADomainTestEventGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATDomainTestEventGenerator
+EDA-Tools,EDADomainTestGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATDomainTestGenerator
+EDA-Tools,EDAErrorsGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATErrorsGenerator
+EDA-Tools,EDAEventGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATEventGenerator
+EDA-Tools,EDAIntegrationTestGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATIntegrationTestGenerator
+EDA-Tools,EDARepositoryGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATRepositoryGenerator
+EDA-Tools,EDATestSupportGenerator,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATTestSupportGenerator
+EDA-Tools,DefaultEnglishCommandNameResolver,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATDefaultEnglishCommandNameResolver
+EDA-Tools,DefaultEnglishEventNameResolver,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATDefaultEnglishEventNameResolver
+EDA-Tools,EDACommandBrowser,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATCommandBrowser
+EDA-Tools,EDAFuelHelper,pharo-eda-common,EDAC-Fuel,EDAC-Fuel,EDACFuelHelper
+EDA-Tools,EDATCheckerGenerator,pharo-eda-tools,EDAT-Tools,EDATCheckerGenerator
+EDA-Tools,EDATCheckerHelper,pharo-eda-tools,EDAT-Tools,EDAT-Tools,EDATCheckerHelper
+EDA-Tools-Tests,AbstractEDAGeneratorTest,pharo-eda-tools,EDAT-Tools-Tests,EDAT-Tools-Tests,EDATAbstractGeneratorTest
+EDA-Traits,EDALoggingSettings,pharo-eda-common,EDAC-Logging,EDAC-Logging,EDACLoggingSettings
+EDA-Traits,EDALoggingStub,pharo-eda-common,EDAC-Logging,EDAC-Logging,EDACLoggingStub
+EDA-Traits,EDAPrintOnHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACPrintOnHelper
+EDA-Traits,EDASourceCodeHelperStub,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACSourceCodeHelperStub
+EDA-Traits,EDATCollectionHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACCollectionHelperStub
+EDA-Traits,EDATDeepInspectHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACDeepInspectHelper
+EDA-Traits,EDATErrorHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACErrorHelper
+EDA-Traits,EDATLanguageHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACLanguageHelper
+EDA-Traits,EDATLogging,pharo-eda-common,EDAC-Logging,EDAC-Logging,EDACLogging
+EDA-Traits,EDATMongoHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACMongoHelper
+EDA-Traits,EDATReflectionHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACReflectionHelper
+EDA-Traits,EDATRegexHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACRegexHelper
+EDA-Traits,EDATRepository,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACRepository
+EDA-Traits,EDATSettingsHelper,pharo-eda-common,EDAC-Settings,EDAC-Settings,EDACSettingsHelper
+EDA-Traits,EDATSourceCodeHelper,pharo-eda-common,EDAC-Traits,EDAC-Traits,EDACSourceCodeHelper
+EDA-Traits-Tests,EDAStringTest,pharo-eda-common,EDAC-Traits-Tests,EDAC-Traits-Tests,EDACStringTest
+EDA-Traits-Tests,EDATCollectionHelperTest,pharo-eda-common,EDAC-Traits-Tests,EDAC-Traits-Tests,EDACCollectionHelperTest
+EDA-Traits-Tests,EDATLanguageHelperTest,pharo-eda-common,EDAC-Traits-Tests,EDAC-Traits-Tests,EDACLanguageHelperTest
+EDA-Traits-Tests,EDATReflectionHelperTest,pharo-eda-common,EDAC-Traits-Tests,EDAC-Traits-Tests,EDACReflectionHelperTest
+EDA-Traits-Tests,EDATSettingHelperTest,pharo-eda-common,EDAC-Settings-Tests,EDAC-Settings-Tests,EDACSettingHelperTest
+EDA-Traits-Tests,EDATSourceCodeHelperTest,pharo-eda-common,EDAC-Traits-Tests,EDAC-Traits-Tests,EDACSourceCodeHelperTest
+]]]
+
+!! Missing classes
+
+- ==EDAEntity== in ==EDA-Entities==.
+- ==EDATEqualsHelper== in ==EDA-Traits==.
+- ==EDATHashHelper== in ==EDA-Traits==.
+
+!! Classes not yet migrated
+
+- ==EDATTestableProjection== in ==EDA-Projections-Tests==.
+- ==EDATestEntityCounterProjection==  in ==EDA-Projections-Tests==.
+
+!! Extensions
+
+- ==Pragma== in ==EDA-Application==.
+- ==Dictionary== in ==EDA-Commands==.
+- ==SmallInteger== in ==EDA-Commands-Tests==.
+- ==Class== in ==EDA-EventStore==.
+- ==ZnClient== in ==EDA-Logging==.
+- ==ZnLogEvent== in ==EDA-Logging==.
+- ==BSON== in ==EDA-Messaging==.
+- ==Error== in ==EDA-Messaging==.
+- ==OID== in ==EDA-Messaging==.
+- ==Collection== in ==EDA-Projections==.
+- ==EDAProjection== in ==EDA-Projections-Voyage-Repository==.
+- ==Dictionary== in ==EDA-Serializers==.
+- ==EDAAggregateRoot== in ==EDA-Serializers==.
+- ==EDACommand== in ==EDA-Serializers==.
+- ==EDAEntity== in ==EDA-Serializers==.
+- ==EDAEventSourcingEvent== in ==EDA-Serializers==.
+- ==StampConstants== in ==EDA-StompMessaging==.
+- ==StampMedium== in ==EDA-StompMessaging==.
+- ==TStampFrameWithBody== in ==EDA-StompMessaging==.
+- ==Dictionary== in ==EDA-Tools==.
