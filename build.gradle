@@ -80,10 +80,15 @@ class DownloadPharoImageTask extends DefaultTask {
 }
 
 class SavePharoImageTask extends DefaultTask {
+    @Input
     String fromImageName = "Pharo.image"
+    @Input
     String pharoPath = "pharo"
+    @Input
     def commonPharoArgs
+    @Input
     String toImageName
+    @Input
     boolean shouldDeleteOldImage
 
     @TaskAction
@@ -102,11 +107,17 @@ class SavePharoImageTask extends DefaultTask {
 }
 
 class LoadMetacelloConfigTask extends DefaultTask {
+    @Input
     String image = "Pharo.image"
+    @Input
     String pharoPath = "pharo"
+    @Input
     def commonPharoArgs
+    @Input
     String repository
+    @Input
     String configuration
+    @Input
     String version
 
     @TaskAction
@@ -122,9 +133,13 @@ class LoadMetacelloConfigTask extends DefaultTask {
 }
 
 class EvalSmalltalkExpressionTask extends DefaultTask {
+    @Input
     String image = "Pharo.image"
+    @Input
     String pharoPath = "pharo"
+    @Input
     def commonPharoArgs
+    @Input
     String expression
 
     @TaskAction
@@ -140,9 +155,13 @@ class EvalSmalltalkExpressionTask extends DefaultTask {
 }
 
 class RunSmalltalkScriptTask extends DefaultTask {
+    @Input
     String image = "Pharo.image"
+    @Input
     String pharoPath = "pharo"
+    @Input
     def commonPharoArgs
+    @Input
     String script
 
     @TaskAction
@@ -158,10 +177,15 @@ class RunSmalltalkScriptTask extends DefaultTask {
 }
 
 class RunPharoTestsTask extends DefaultTask {
+    @Input
     String image = "Pharo.image"
+    @Input
     String pharoPath = "pharo"
+    @Input
     def commonPharoArgs
+    @Input
     String packageName
+    @Input
     boolean shouldOutputAsJUnit
 
     @TaskAction
