@@ -94,7 +94,7 @@ BaselineOfPharoEDA >> includeNeoJSON: spec [
 BaselineOfPharoEDA >> includePharoEDAAdapters: spec [
 	spec
 		baseline: 'PharoEDAAdapters'
-		with: [ spec repository: 'github://osoco/pharo-eda-adapters:main' ].
+		with: [ spec repository: 'github://rydnr/pharo-eda-adapters:main' ].
 	^ spec
 ]
 
@@ -102,7 +102,7 @@ BaselineOfPharoEDA >> includePharoEDAAdapters: spec [
 BaselineOfPharoEDA >> includePharoEDAApi: spec [
 spec
 		baseline: 'PharoEDAApi'
-		with: [ spec repository: 'github://osoco/pharo-eda-api:main' ].
+		with: [ spec repository: 'github://rydnr/pharo-eda-api:main' ].
 	^ spec
 ]
 
@@ -110,7 +110,7 @@ spec
 BaselineOfPharoEDA >> includePharoEDACommon: spec [
 spec
 		baseline: 'PharoEDACommon'
-		with: [ spec repository: 'github://osoco/pharo-eda-common:main' ].
+		with: [ spec repository: 'github://rydnr/pharo-eda-common:main' ].
 	^ spec
 ]
 
@@ -118,7 +118,7 @@ spec
 BaselineOfPharoEDA >> includePharoEDAPorts: spec [
 spec
 		baseline: 'PharoEDAPorts'
-		with: [ spec repository: 'github://osoco/pharo-eda-ports:main' ].
+		with: [ spec repository: 'github://rydnr/pharo-eda-ports:main' ].
 	^ spec
 ]
 
@@ -126,7 +126,7 @@ spec
 BaselineOfPharoEDA >> includePharoEDASettings: spec [
 spec
 		baseline: 'PharoEDASettings'
-		with: [ spec repository: 'github://osoco/pharo-eda-settings:main' ].
+		with: [ spec repository: 'github://rydnr/pharo-eda-settings:main' ].
 	^ spec
 ]
 
@@ -134,6 +134,6 @@ spec
 BaselineOfPharoEDA >> includePharoEDATools: spec [
 spec
 		baseline: 'PharoEDATools'
-		with: [ spec repository: 'github://osoco/pharo-eda-tools:main' ].
+		with: [ spec repository: 'github://rydnr/pharo-eda-tools:main' ].
 	^ spec
 ]
