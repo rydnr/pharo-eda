@@ -14,7 +14,7 @@ Currently, only one PharoEDA application can be running in a Pharo image at the 
 
 An ==EDAApplication== has configurable properties, that can be inspected and modified using ==SettingBrowser==.
 The ==SettingBrowser== customization is done in ==EDASettings== class, using the ==<systemsettings>== pragma, which requires the method to be on the class side.
-Currently, the methods in charge of creating the customization tree expects each setting is stored in specific classes, available via accessors, in class-side attributes. The main benefit of this approach is to make ==EDASettings== unaware of the existence of the ==EDAApplication== class. However, this only applies on the surface, because both classes know where the actual setting values are stored.
+Currently, the methods in charge of creating the customization tree expect each setting is stored in specific classes, available via accessors, in class-side attributes. The main benefit of this approach is to make ==EDASettings== unaware of the existence of the ==EDAApplication== class. However, this only applies on the surface, because both classes know where the actual setting values are stored.
 
 Additionally, the configuration settings are read from a json file, which gets identified by an environment variable. But that file is only used for the initial values, and its contents are not synchronized with the values of the application after they are modified using ==SettingBrowser== or by any other means. Ideally, each setting could be managed differently: either from an environment variable, from a json file, from a global value, and so on.
 
@@ -35,7 +35,7 @@ At the end, we'll be able to have different ==EDAApplication== instances running
 To load the project,
 
 [[[
-Metacello new repository: 'github://osoco/pharo-eda:settings'; baseline: #PharoEDA; load
+Metacello new repository: 'github://rydnr/pharo-eda:settings'; baseline: #PharoEDA; load
 ]]]
 
-${loader:account=osoco|project=pharo-eda|tag=settings|baseline=PharoEDA}$
+${loader:account=rydnr|project=pharo-eda|tag=settings|baseline=PharoEDA}$
