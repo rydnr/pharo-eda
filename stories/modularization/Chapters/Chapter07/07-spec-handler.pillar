@@ -1,4 +1,4 @@
-! Spec handler
+!! Spec handler
 
 This handler behaves in a similar way as ==EDAMMConfigurationCommandHandler==. It's responsibility is to read the spec file and make it available in the context for other handlers to use.
 

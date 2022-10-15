@@ -1,4 +1,4 @@
-! Configuration handler
+!! Configuration handler
 
 This handler would inject the configuration information into the context, when executing the chain of responsibility.
 

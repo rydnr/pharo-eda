@@ -1,8 +1,8 @@
-! Write class handler
+!! Write class handler
 
 We'll now proceed to do the same for writing classes to disk.
 
-!! A helper class to write classes in Tonel format
+!!! A helper class to write classes in Tonel format
 
 As we did before, let's start with a new test, this time in the same ==EDAMMClassFileTest==.
 
@@ -48,7 +48,7 @@ EDAMMClassFile >> writeClassNamed: aString withDefinitions: aCollection inFolder
 		yourself
 ]]]
 
-!! A handler for writing a class
+!!! A handler for writing a class
 
 Now we're ready to focus now on the handler to serialize a class in Tonel format.
 

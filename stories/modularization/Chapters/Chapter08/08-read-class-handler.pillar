@@ -1,10 +1,10 @@
-! read class handler
+!! read class handler
 
 Now it's time to deal with the main purpose of this migration tool: copying classes to another directory. It'll perform a "file-out" on the source class, in Tonel format, to the output directory.
 
 However, later we know we'll need to check if the class already exists in the destination, so it's better to start with the logic in charge or reading files in Tonel format.
 
-!! A helper class to read Tonel files
+!!! A helper class to read Tonel files
 
 We can define a simple test for reading a known class.
 
@@ -53,7 +53,7 @@ EDAMMClassFile >> readClass: aClassName inPackage: aPackageName inFolder: aFolde
 
 Notice TonelReader returns a list of definitions: one for the class itself, and one for each method.
 
-!! A handler for reading a class
+!!! A handler for reading a class
 
 Using the helper class we just implemented, we can now write a handler that reads the class and binds it to the context for other commands to process.
 

@@ -1,4 +1,4 @@
-! Writing the specs
+!! Writing the specs
 
 Finally we can profit from our modularization. Recall our journey started with a problem statement: automate copying and renaming classes from pharo-eda develop, to the new pharo-eda modules.
 
@@ -150,18 +150,18 @@ EDA-Traits-Tests,EDATSettingHelperTest,pharo-eda-common,EDAC-Settings-Tests,EDAC
 EDA-Traits-Tests,EDATSourceCodeHelperTest,pharo-eda-common,EDAC-Traits-Tests,EDAC-Traits-Tests,EDACSourceCodeHelperTest
 ]]]
 
-!! Missing classes
+!!! Missing classes
 
 - ==EDAEntity== in ==EDA-Entities==.
 - ==EDATEqualsHelper== in ==EDA-Traits==.
 - ==EDATHashHelper== in ==EDA-Traits==.
 
-!! Classes not yet migrated
+!!! Classes not yet migrated
 
 - ==EDATTestableProjection== in ==EDA-Projections-Tests==.
 - ==EDATestEntityCounterProjection==  in ==EDA-Projections-Tests==.
 
-!! Extensions
+!!! Extensions
 
 - ==Pragma== in ==EDA-Application==.
 - ==Dictionary== in ==EDA-Commands==.

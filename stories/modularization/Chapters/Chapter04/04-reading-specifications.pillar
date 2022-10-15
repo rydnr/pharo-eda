@@ -1,4 +1,4 @@
-! Reading specifications
+!! Reading specifications
 
 Now that we have the basic logic to read the configuration settings, we can build the logic needed to read the specifications, i.e., which class should be copied where.
 
@@ -14,7 +14,7 @@ For example,
 EDA-Events,EDAEventSourcingEvent,pharo-eda-api,EDAAPI-Events,EDAEventSourcingEvent
 ]]]
 
-!! Initial test
+!!! Initial test
 
 We need an initial test. But first, the test class, in ==EDA-Miltimodule-Migration-Tests==.
 

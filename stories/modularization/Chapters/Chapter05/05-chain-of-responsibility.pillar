@@ -1,4 +1,4 @@
-! Chain of responsibility
+!! Chain of responsibility
 
 Now that we can read the specifications and the configuration files, we can try to process each specification.
 
@@ -6,7 +6,7 @@ One basic thing to do is to copy the file to its final destination. We won't be 
 
 However, to accomodate all steps confortably, we'll apply the Chain of Responsibility pattern.
 
-!! Basic layout
+!!! Basic layout
 
 The pattern suggests to model two base concepts: ==CommandSender== and ==CommandHandler==, and specific handlers as subclasses of the latter.
 
@@ -99,7 +99,7 @@ EDAMMLoggingCommandHandler >> initialize
 
 The test now should pass.
 
-!! Logging handler
+!!! Logging handler
 
 Let's add a new test.
 
@@ -163,7 +163,7 @@ EDAMMLoggingCommandHandler >> handleCommand: aCommand within: aContext
 
 The test should be passing now.
 
-!! Chain of Responsibility
+!!! Chain of Responsibility
 
 To define which handlers we want to get involved in the chain, we'll use a Composite pattern.
 

@@ -1,4 +1,4 @@
-! Changing the package and category of the class
+!! Changing the package and category of the class
 
 The specification states how a class should be migrated to its new PharoEDA module, and in which package it should reside.
 So far we've successfully copied classes to their expected submodule, but we leave the package unmodified, regardless of what the specification says.
@@ -107,7 +107,7 @@ There're two options:
 
 The second option is better. First of all, it's explicit, and allows us to implement it faster. Second, it can accomodate the first option as well if we need. We could add a new handler that provides the value of the new category, if the specification omits it, based on the source category, the source package, and the destination package.
 
-!! Updating the specification to include the target category
+!!! Updating the specification to include the target category
 
 We have ==EDAMMSpecReaderCommandHandlerTest==, so let's use it.
 
@@ -647,7 +647,7 @@ testSpecReaderCommandHandler
 		equals: 'EDAEventSourcingEvent'
 ]]]
 
-!! New handler for overwriting the category
+!!! New handler for overwriting the category
 
 The classes responsible of reading and writing classes in Tonel format are ==EDAMMClassFileReaderCommandHandler== and ==EDAMMClassFileWriterCommandHandler==. The category information is just data from the class definition. If we changed them to deal with this category issue, we'd be adding a responsibility they don't need. After all, we are using a chain of responsibility, and that pattern is designed precisely to help us adding new responsibilities without needing to modify existing ones. We should add a new command handler in between the two, that replaces the original class definition with another one, that merely changes the category according to the spec.
 

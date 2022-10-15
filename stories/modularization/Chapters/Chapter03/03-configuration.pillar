@@ -1,4 +1,4 @@
-! Configuration
+!! Configuration
 
 Let's start our tool by implementing the configuration layer.
 
@@ -10,7 +10,7 @@ pharo-eda-adapters,/tmp/pharo-eda-adapters/src
 
 Each row contains two fields: the name of a module, and a folder.
 
-!! First test
+!!! First test
 
 The first is simple: given a file, interpret its contents.
 
