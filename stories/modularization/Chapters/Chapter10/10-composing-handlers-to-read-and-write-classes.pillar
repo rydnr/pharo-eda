@@ -159,7 +159,7 @@ The test takes care of the following:
 - creating a new temporary folder where ==MigrationTool== will copy the classes,
 - creating a configuration file to associate the temporary folder with the destination module,
 - creating a specs file,
-- running ==MigrationTool=,
+- running ==MigrationTool==,
 - checking if the temporary folder contains the copied classes.
 
 We'll create a separate method to create a new empty folder for the test.
