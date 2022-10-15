@@ -232,7 +232,8 @@ EDAMMMigrationToolTest >> testMigrationTool
 		assert: (outputFolder / 'EDAAPI-Events' / 'EDAEventSourcingEvent.st') exists.
 	self assert: (outputFolder / 'EDAAPI-Aggregates') exists.
 	self
-		assert: (outputFolder / 'EDAAPI-Aggregates' / 'EDAAggregateRoot.st') exists]]]
+		assert: (outputFolder / 'EDAAPI-Aggregates' / 'EDAAggregateRoot.st') exists
+]]]
 
 As always, we need to create the class just when saving the method.
 
