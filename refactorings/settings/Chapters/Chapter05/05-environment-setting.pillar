@@ -1,5 +1,3 @@
-! Refactorings
-
 !! Environment setting
 
 This setting is used to identify the environment. Currently, it shows the value of the ""PHARO_ENV"" environment variable. The first adapter would be one that implements this behavior.
