@@ -225,12 +225,14 @@ EDAApplication >> doSetup [
 
 { #category : #accessing }
 EDAApplication >> environmentSettingsPort [
-	^ environmentSettingsPort ifNil: [ self environmentSettingsPort: EDAPortResolver new resolveEnvironmentSettingsPort. environmentSettingsPort ]
+
+	^   self portSettingsPort environmentSettingsPort 
 ]
 
 { #category : #accessing }
 EDAApplication >> environmentSettingsPort: anAdapter [
-	environmentSettingsPort := anAdapter
+
+	anAdapter = self portSettingsPort environmentSettingsPort ifTrue: [ ^ self ] ifFalse: [ self portSettingsPort environmentSettingsPort: anAdapter ]
 ]
 
 { #category : #accessing }
@@ -337,32 +339,32 @@ EDAApplication >> loggingSettingsPort [
 { #category : #accessing }
 EDAApplication >> notifyEnvironmentSettingsPortListener: anAdapter [
 	self settingsAnnouncer
-		announce: (EDAEnvironmentSettingsPortChanged with: anAdapter on: self)
+		announce: (EDASEnvironmentSettingsPortChanged with: anAdapter on: self)
 ]
 
 { #category : #accessing }
 EDAApplication >> notifyEnvironmentSettingsResolverPortListener: anAdapter [
 	self settingsAnnouncer
-		announce: (EDAEnvironmentSettingsResolverPortChanged with: anAdapter on: self)
+		announce: (EDASEnvironmentSettingsResolverPortChanged with: anAdapter on: self)
 ]
 
 { #category : #accessing }
 EDAApplication >> notifyEventStoreSettingsPortListener: anAdapter [
 	self settingsAnnouncer
-		announce: (EDAEventStoreSettingsPortChanged with: anAdapter on: self)
+		announce: (EDASEventStoreSettingsPortChanged with: anAdapter on: self)
 ]
 
 { #category : #accessing }
 EDAApplication >> notifyEventStoreSettingsResolverPortListener: anAdapter [
 	self settingsAnnouncer
-		announce: (EDAEventStoreSettingsResolverPortChanged with: anAdapter on: self)
+		announce: (EDASEventStoreSettingsResolverPortChanged with: anAdapter on: self)
 ]
 
 { #category : #accessing }
 EDAApplication >> portSettingsPort [
 	^ portSettingsPort
 		ifNil: [ | result |
-			result := EDAPortSettingsPort withAnnouncer: self settingsAnnouncer.
+			result := EDASPortSettingsPort withAnnouncer: self settingsAnnouncer.
 			self portSettingsPort: result.
 			result ]
 ]
@@ -497,32 +499,32 @@ EDAApplication >> resetSettingsAnnouncer [
 
 { #category : #accessing }
 EDAApplication >> resolveCommandListenerSettingsPort [
-	^ self resolveSettingsPort: EDATCommandListenerSettingsPort
+	^ self resolveSettingsPort: EDASCommandListenerSettingsPort
 ]
 
 { #category : #accessing }
 EDAApplication >> resolveEnvironmentSettingsPort [
-	^ self resolveSettingsPort: EDATEnvironmentSettingsPort
+	^ self resolveSettingsPort: EDASEnvironmentSettingsPort
 ]
 
 { #category : #accessing }
 EDAApplication >> resolveEventPublisherSettingsPort [
-	^ self resolveSettingsPort: EDATEventPublisherSettingsPort
+	^ self resolveSettingsPort: EDASEventPublisherSettingsPort
 ]
 
 { #category : #accessing }
 EDAApplication >> resolveEventStoreSettingsPort [
-	^ self resolveSettingsPort: EDATEventStoreSettingsPort
+	^ self resolveSettingsPort: EDASEventStoreSettingsPort
 ]
 
 { #category : #accessing }
 EDAApplication >> resolveLoggingSettingsPort [
-	^ self resolveSettingsPort: EDATLoggingSettingsPort
+	^ self resolveSettingsPort: EDASLoggingSettingsPort
 ]
 
 { #category : #accessing }
 EDAApplication >> resolveProjectionSettingsPort [
-	^ self resolveSettingsPort: EDATProjectionSettingsPort
+	^ self resolveSettingsPort: EDASProjectionSettingsPort
 ]
 
 { #category : #accessing }
