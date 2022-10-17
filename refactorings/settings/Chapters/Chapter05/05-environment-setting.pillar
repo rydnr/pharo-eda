@@ -349,7 +349,7 @@ EDAApplication >> environmentSettingsPort
   ^ result
 ]]]
 
-The only missing piece is to provide a description. It'd be great if We'll use some methods from existing traits in PharoEDA.
+The only missing piece is to provide a description. It'd be great if we use some methods from existing traits in PharoEDA.
 
 [[[classDefinition=true
 Object subclass: #EDAPredefinedEnvironmentSettingsInMemoryAdapter
@@ -367,7 +367,7 @@ EDAPredefinedEnvironmentSettingsInMemoryAdapter class >> description
 
 !!!! Refactoring
 
-As we did with the environment-variable adapter, let's introduce a new intermediary trait, common to all "in-memory" adapters, to indicate ""isReadOnly"" and "supportsMultiple" are ""false"" for this kind of adapters.
+As we did with the environment-variable adapter, let's introduce a new intermediary trait, common to all "in-memory" adapters, to indicate ""isReadOnly"" and ""supportsMultiple"" are false for this kind of adapters.
 
 [[[classDefinition=true
 Trait named: #EDATInMemoryAdapter

@@ -2,7 +2,7 @@
 
 The list of adapters visible to ==EDAPortResolver== are not sorted in any way. The straightforward way to sort them is by using ""collect:sorted:"".
 
-In the ''sorted'' block, we need to define how we want them sorted. To avoid unnecessary coupling, we'll use ""<"" to find out if a given adapter should appear before another. To provide a common way to compare adapters, let's introduce the concept of **priority**.
+In the ''sorted'' block, we need to define how we want them sorted. To avoid unnecessary coupling, we'll use ""<"" to find out if a given adapter should appear before another. To provide a common way to compare adapters, let's introduce the concept of ''priority''.
 
 The idea is two fold: to define a way to sort adapters, and also a way to implement which adapter should be used by default. Keep in mind this is meant to only compare adapters fitting in a common port.
 
@@ -224,7 +224,7 @@ environmentSettingsPort
     ]
 ]]]
 
-There's one missing piece to implement. ==EDASettings== builds a subtree to let the user choose which class of adapter used in each port, in its ''portSettingsOn:under:on:'' method. The actual option sends the message ==#environmentSettingsAdapterClass== to ''app portSettingsPort''. So ==EDAPortSettingsPort== needs to keep track of the **class** of the adapter used too.
+There's one missing piece to implement. ==EDASettings== builds a subtree to let the user choose which class of adapter used in each port, in its ''portSettingsOn:under:on:'' method. The actual option sends the message ==#environmentSettingsAdapterClass== to ''app portSettingsPort''. So ==EDAPortSettingsPort== needs to keep track of the ''class'' of the adapter used too.
 
 % ${changes:path=code/020-EDAPortSettingsPort.ombu}
 [[[classDefinition=true
@@ -234,7 +234,7 @@ Object subclass: #EDAPortSettingsPort
 	package: 'EDA-Settings-Ports'
 ]]]
 
-It might appear a bit confusing: we're refering to the class in ''environmentSettingsAdapterClass'', but we are using ''environmentSettingsPort'' to reference the instance (of the class). We use **port** for the instance since it's how ==EDAApplication== sees it. But from the point of view of ==EDASettings==, we're choosing among a list of **adapter classes**. It's unaware how they're used elsewhere.
+It might appear a bit confusing: we're refering to the class in ''environmentSettingsAdapterClass'', but we are using ''environmentSettingsPort'' to reference the instance (of the class). We use ''port'' for the instance since it's how ==EDAApplication== sees it. But from the point of view of ==EDASettings==, we're choosing among a list of ''adapter classes''. It's unaware how they're used elsewhere.
 
 We need to provide accessors, as they are used by ==EDASettings==.
 

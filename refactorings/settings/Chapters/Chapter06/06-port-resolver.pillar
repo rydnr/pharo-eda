@@ -258,10 +258,10 @@ EDAEnvironmentSettingsInMemoryAdapter class >> accepts: aPort
 Additionally, ==EDAPredefinedEnvironmentSettingsInMemoryAdapter== didn't use the ==EDATEnvironmentSettingsPort== trait:
 
 % ${changes:path=code/023-EDAPredefinedEnvironmentSettingsInMemoryAdapter.ombu}$
-{{{classDefinition=true
+[[[classDefinition=true
 Object subclass: #EDAPredefinedEnvironmentSettingsInMemoryAdapter
 	uses: EDATInMemoryAdapter + EDATEnvironmentSettingsPort
 	instanceVariableNames: 'currentEnvironment'
 	classVariableNames: ''
 	package: 'EDA-Settings-Adapters-InMemory'
-}}}
+]]]

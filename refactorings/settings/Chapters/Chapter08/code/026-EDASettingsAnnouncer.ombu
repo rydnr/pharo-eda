@@ -1,0 +1,51 @@
+OmEntry {
+	#tags : {
+		#prior : OmNullReference [  ],
+		#self : OmReference [ '1' ]
+	},
+	#content : EpClassAddition {
+		#class : RGClassDefinition {
+			#annotations : IdentityDictionary {
+				#definitionSource : 'Announcer subclass: #EDASSettingsAnnouncer\r\tinstanceVariableNames: \'edaApplication\'\r\tclassVariableNames: \'\'\r\tpackage: \'EDAS-Settings\'',
+				#superclassName : 'Announcer',
+				#traitCompositionSource : '{}'
+			},
+			#name : #EDASSettingsAnnouncer,
+			#methods : IdentityDictionary { },
+			#protocols : Set [ ],
+			#instanceVariables : OrderedCollection [
+				RGInstanceVariableDefinition {
+					#annotations : IdentityDictionary {
+						#isMetaSide : false,
+						#className : #EDASSettingsAnnouncer
+					},
+					#name : #edaApplication,
+					#parent : @6
+				}
+			],
+			#metaClass : RGMetaclassDefinition {
+				#annotations : IdentityDictionary {
+					#definitionSource : 'EDASSettingsAnnouncer class\r\tinstanceVariableNames: \'\'',
+					#traitCompositionSource : '{}'
+				},
+				#name : #'EDASSettingsAnnouncer class',
+				#methods : IdentityDictionary { },
+				#protocols : Set [ ],
+				#instanceVariables : OrderedCollection [ ],
+				#baseClass : @6
+			},
+			#comment : RGCommentDefinition {
+				#annotations : IdentityDictionary {
+					#isMetaSide : false,
+					#className : #EDASSettingsAnnouncer
+				},
+				#parent : @6,
+				#content : ''
+			},
+			#classVariables : OrderedCollection [ ],
+			#category : #EDAS-Settings,
+			#package : #EDAS-Settings,
+			#sharedPools : OrderedCollection [ ]
+		}
+	}
+}

@@ -1,0 +1,19 @@
+OmEntry {
+	#tags : {
+		#prior : OmNullReference [  ],
+		#self : OmReference [ '1' ]
+	},
+	#content : EpMethodAddition {
+		#method : RGMethodDefinition {
+			#annotations : IdentityDictionary {
+				#isMetaSide : true,
+				#className : #'EDASSettingsAnnouncer class'
+			},
+			#name : #'forApp:',
+			#protocol : #'instance creation',
+			#sourceCode : 'forApp: anEDAApplication\r\r\t^ self new\r\t\t  edaApplication: anEDAApplication;\r\t\t  yourself',
+			#stamp : 'JoseSanLeandro 10/17/2022 10:08',
+			#package : #EDAS-Settings
+		}
+	}
+}

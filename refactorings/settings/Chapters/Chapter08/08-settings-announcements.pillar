@@ -73,20 +73,20 @@ We want to emit an event whenever the ''environmentSettingAdapterClass'' changes
 EDASettingsChanged subclass: #EDAEnvironmentSettingsAdapterClassChanged
 	instanceVariableNames: ''
 	classVariableNames: ''
-	package: 'EDA-Application'
+	package: 'EDAS-Settings'
 ]]]
 
 At the end of the day, we would like to close and reopen any ==SettingBrowser==. Let's add that feature in a trait.
-% ${changes:path=code/010-EDATSettingBrowserHelper.ombu}
+% ${changes:path=code/010-EDACSettingBrowserHelper.ombu}
 [[[classDefinition=true
-Trait named: #EDATSettingBrowserHelper
+Trait named: #EDACSettingBrowserHelper
 	 uses: {}
-	 package: 'EDA-Traits'
+	 package: 'EDAC-Settings'
 ]]]
 
 The code is pretty rudimentary. It inspects all submorphs existing in the "world" matching ==SettingBrowser== class, deletes them, and creates a new one.
 
-% ${changes:path=code/011-EDATSettingBrowserHelper_classTrait_refreshSettingBrowsers.ombu}
+% ${changes:path=code/011-EDACSettingBrowserHelper_classTrait_refreshSettingBrowsers.ombu}
 [[[methodDefinition=true
 refreshSettingBrowsers
 	self currentWorld submorphs
@@ -97,14 +97,10 @@ refreshSettingBrowsers
 ]]]
 
 We find useful to create a instance method as well.
-% ${changes:path=code/012-EDATSettingBrowserHelper_refreshSettingBrowsers.ombu}
+% ${changes:path=code/012-EDACSettingBrowserHelper_refreshSettingBrowsers.ombu}
 [[[methodDefinition=true
 refreshSettingBrowsers
-	self currentWorld submorphs
-		select: [ :w | w model class = SettingBrowser ]
-		thenCollect: [ :w |
-			w delete.
-			SettingBrowser open ]
+	self class refreshSettingBrowsers
 ]]]
 
 Next thing to do is to write a announcement subscriber, i.e., an instance that gets notified of any ==EDASettingsChanged== event and performs some action in response. In our case, a suitable name could be ==EDASettingsSubscriber==.
@@ -112,7 +108,7 @@ Next thing to do is to write a announcement subscriber, i.e., an instance that g
 % ${changes:path=code/013-EDASettingsSubscriber.ombu}
 [[[classDefinition=true
 Object subclass: #EDASettingsSubscriber
-	uses: EDATSettingBrowserHelper
+	uses: EDACSettingBrowserHelper
 	instanceVariableNames: ''
 	classVariableNames: ''
 	package: 'EDA-Application'
@@ -240,24 +236,24 @@ Let's recap for a second the responsibilities of each one:
 
 ==EDAApplication== holds a reference to ==EDASettingsSubscriber==, but it's only used to add the event listeners, which act back on the ==EDAApplication== itself. We could pass that responsibility to ==EDAPortSettingsPort==. Actually, let's remove ==EDASettingsSubscriber== altogether (including ==EDAApplication== accessors).
 
-A feasible design for this problem is to build ==EDAPortSettingsPort==, and any other adapter, with a reference to a new ==EDASettingsAnnouncer==. Its main purpose is to be used to send settings events, and to register subscribers to those events.
+A feasible design for this problem is to build ==EDAPortSettingsPort==, and any other adapter, with a reference to a new ==EDASSettingsAnnouncer==. Its main purpose is to be used to send settings events, and to register subscribers to those events.
 
-% ${changes:path=code/026-EDASettingsAnnouncer.ombu}
+% ${changes:path=code/026-EDASSettingsAnnouncer.ombu}
 [[[classDefinition=true
-Announcer subclass: #EDASettingsAnnouncer
+Announcer subclass: #EDASSettingsAnnouncer
 	instanceVariableNames: 'edaApplication'
 	classVariableNames: ''
-	package: 'EDA-Settings'
+	package: 'EDAS-Settings'
 ]]]
 
 The usual accessors:
-% ${changes:path=code/027-EDASettingsAnnouncer_edaApplication.ombu}
+% ${changes:path=code/027-EDASSettingsAnnouncer_edaApplication.ombu}
 [[[methodDefinition=true
 edaApplication
 	^ edaApplication
 ]]]
 
-% ${changes:path=code/028-EDASettingsAnnouncer_edaApplication_.ombu}
+% ${changes:path=code/028-EDASSettingsAnnouncer_edaApplication_.ombu}
 [[[methodDefinition=true
 edaApplication: anObject
 	edaApplication := anObject
@@ -265,7 +261,7 @@ edaApplication: anObject
 
 And a factory method:
 
-% ${changes:path=code/029-EDASettingsAnnouncer_class_forApp_.ombu}
+% ${changes:path=code/029-EDASSettingsAnnouncer_class_forApp_.ombu}
 [[[methodDefinition=true
 forApp: anEDAApplication
 	^ self new
@@ -279,7 +275,7 @@ forApp: anEDAApplication
 [[[methodDefinition=true
 settingsAnnouncer
 	settingsAnnouncer
-		ifNil: [ self settingsAnnouncer: (EDASettingsAnnouncer forApp: self) ].
+		ifNil: [ self settingsAnnouncer: (EDASSettingsAnnouncer forApp: self) ].
 	^ settingsAnnouncer
 ]]]
 
@@ -290,7 +286,7 @@ Additionally, ==PortSettingsPort== can hold a reference to it as well.
 Object subclass: #EDAPortSettingsPort
 	instanceVariableNames: 'announcer environmentSettingsPort environmentSettingsAdapterClass'
 	classVariableNames: ''
-	package: 'EDA-Settings-Ports'
+	package: 'EDAS-Settings-Ports'
 ]]]
 
 % ${changes:path=code/032-EDAPortSettingsPort_announcer.ombu}
@@ -307,9 +303,9 @@ announcer: anObject
 
 % ${changes:path=code/034-EDAPortSettingsPort_class_withAnnouncer_.ombu}
 [[[methodDefinition=true
-withAnnouncer: anEDASettingsAnnouncer
+withAnnouncer: anEDASSettingsAnnouncer
 	^ self new
-		announcer: anEDASettingsAnnouncer;
+		announcer: anEDASSettingsAnnouncer;
 		yourself
 ]]]
 
@@ -368,34 +364,34 @@ Now that the event is emitted, we want to react in response. For sure, we want t
 % ${changes:path=code/039-EDASettingBrowserRefresher.ombu}
 [[[classDefinition=true
 Object subclass: #EDASettingBrowserRefresher
-	uses: EDATSettingBrowserHelper
+	uses: EDACSettingBrowserHelper
 	instanceVariableNames: ''
 	classVariableNames: ''
-	package: 'EDA-Settings'
+	package: 'EDAC-Settings'
 ]]]
 
 % ${changes:path=code/040-EDASettingBrowserRefresher_class_subscribeToSettingsChangedEventsIn_.ombu}
 [[[methodDefinition=true
-subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
-	anEDASettingsAnnouncer
+subscribeToSettingsChangedEventsIn: anEDASSettingsAnnouncer
+	anEDASSettingsAnnouncer
 		when: EDASettingsChanged
 		do: [ self refreshSettingBrowsers ]
 ]]]
 
-We could call this method of ==EDASettingBrowserRefresher== whenever we initialize a new ==EDASettingsAnnouncer==. However, we aim to dynamically discover classes interested in listening to ==EDASettingsChanged== events. Let's do it using traits.
+We could call this method of ==EDASettingBrowserRefresher== whenever we initialize a new ==EDASSettingsAnnouncer==. However, we aim to dynamically discover classes interested in listening to ==EDASettingsChanged== events. Let's do it using traits.
 
-% ${changes:path=code/041-EDATSettingsChangedListener.ombu}
+% ${changes:path=code/041-EDASSettingsChangedListener.ombu}
 [[[classDefinition=true
-Trait named: #EDATSettingsChangedListener
+Trait named: #EDASSettingsChangedListener
 	 uses: {}
-	 package: 'EDA-Settings'
+	 package: 'EDAS-Settings'
 ]]]
 
 At this moment we only expect users of this trait to override the following method:
 
-% ${changes:path=code/042-EDATSettingsChangedListener_traitClass_subscribeToSettingsChangedEventsIn_.ombu}
+% ${changes:path=code/042-EDASSettingsChangedListener_traitClass_subscribeToSettingsChangedEventsIn_.ombu}
 [[[methodDefinition=true
-subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
+subscribeToSettingsChangedEventsIn: anEDASSettingsAnnouncer
 	self shouldBeImplemented
 ]]]
 
@@ -404,25 +400,25 @@ subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
 % ${changes:path=code/043-EDASettingBrowserRefresher.ombu}
 [[[classDefinition=true
 Object subclass: #EDASettingBrowserRefresher
-	uses: EDATSettingsChangedListener + EDATSettingBrowserHelper
+	uses: EDASSettingsChangedListener + EDACSettingBrowserHelper
 	instanceVariableNames: ''
 	classVariableNames: ''
-	package: 'EDA-Settings'
+	package: 'EDAC-Settings'
 ]]]
 
 We can now deal with the logic to let users of the trait to subscribe to the events they need.
 
-% ${changes:path=code/044-EDASettingsAnnouncer_initialize.ombu}
+% ${changes:path=code/044-EDASSettingsAnnouncer_initialize.ombu}
 [[[methodDefinition=true
 initialize
 	super initialize.
 	self setupListeners
 ]]]
 
-% ${changes:path=code/045-EDASettingsAnnouncer_setupListeners.ombu}
+% ${changes:path=code/045-EDASSettingsAnnouncer_setupListeners.ombu}
 [[[methodDefinition=true
 setupListeners
-	EDATSettingsChangedListener traitUsers
+	EDASSettingsChangedListener traitUsers
 		do: [ :l | lsubscribeToSettingsChangedEventsIn: self ]
 ]]]
 
@@ -440,18 +436,18 @@ We can model this behavior by calling the ''environmentSettingPort:'' accessor o
 % ${changes:path=code/046-EDAEnvironmentSettingsRefresher.ombu}
 [[[classDefinition=true
 Object subclass: #EDAEnvironmentSettingsRefresher
-	uses: EDATSettingsChangedListener
+	uses: EDASSettingsChangedListener
 	instanceVariableNames: ''
 	classVariableNames: ''
-	package: 'EDA-Settings'
+	package: 'EDAC-Settings'
 ]]]
 
 The behavior is straight forward: whenever an ==EDAEnvironmentSettingsAdapterClassChanged== is emitted, we want the ==EDAApplication== to use a new adapter instance.
 
 % ${changes:path=code/047-EDAEnvironmentSettingsRefresher_class_subscribeToSettingsChangedEventsIn_.ombu}
 [[[methodDefinition=true
-subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
-	anEDASettingsAnnouncer
+subscribeToSettingsChangedEventsIn: anEDASSettingsAnnouncer
+	anEDASSettingsAnnouncer
 		when: EDAEnvironmentSettingsAdapterClassChanged
 		do:
 			[ :event | event edaApplication environmentSettingsPort: event newValue new ]
@@ -473,25 +469,22 @@ Transcript flush
 
 ==Transcript== shows the order is not guaranteed.
 
-In this situation, we could either include ==EDATSettingBrowserRefresher== trait in all listeners, or make each listener emit a new event after its own processing. The former option is simpler, and we could remove ==EDASettingBrowserRefresher==.
+In this situation, we could either include ==EDACSettingBrowserRefresher== trait in all listeners, make each listener emit a new event after its own processing, or add a new listener to refresh the browser. Even if it's not called last, it would work just fine.
 
-% ${changes:path=code/048-EDAEnvironmentSettingsRefresher.ombu}
+% ${changes:path=code/048-EDASSettingBrowserRefresher.ombu}
 [[[classDefinition=true
-Object subclass: #EDAEnvironmentSettingsRefresher
-	uses: EDATSettingsChangedListener + EDATSettingBrowserHelper
+Object subclass: #EDASSettingBrowserRefresher
+	uses: EDASSettingsChangedListener + EDACSettingBrowserHelper
 	instanceVariableNames: ''
 	classVariableNames: ''
-	package: 'EDA-Settings'
+	package: 'EDAS-Settings'
 ]]]
 
-% ${changes:path=code/049-EDAEnvironmentSettingsRefresher_class_subscribeToSettingsChangedEventsIn_.ombu}
+% ${changes:path=code/049-EDASSettingBrowserRefresher_class_subscribeToSettingsChangedEventsIn_.ombu}
 [[[methodDefinition=true
-subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
-	anEDASettingsAnnouncer
+subscribeToSettingsChangedEventsIn: anEDASSettingsAnnouncer
+	anEDASSettingsAnnouncer
 		when: EDAEnvironmentSettingsAdapterClassChanged
 		do: [ :event |
-			event edaApplication environmentSettingsPort: event newValue new.
 			self refreshSettingBrowsers ]
 ]]]
-
-Voilà. Now it works just fine.
