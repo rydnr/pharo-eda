@@ -21,7 +21,7 @@ Later, we might want to introduce a way to group ports together. The ==EDAApplic
 
 This setting, due to its nature, does not allow any adapter but a predefined list.
 Anyway, for the sake of consistency, let's avoid dealing with particular cases.
-After adding this adapter class setting to ''portSettingsOn:under:on:" in ==EDASettings== we get:
+After adding this adapter class setting to ''portSettingsOn:under:on:'' in ==EDASettings== we get:
 
 % ${changes:path=code/001-EDASettings_class_portSettingsOn_under_on_.ombu}
 [[[methodDefinition=true
