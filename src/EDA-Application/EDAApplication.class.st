@@ -39,6 +39,7 @@ Class {
 		'portSettingsPort',
 		'environmentSettingsPort',
 		'environmentSettingsResolverPort',
+		'commandListenerErrorStrategySettingsPort',
 		'settingsAnnouncer',
 		'eventStoreSettingsPort'
 	],
@@ -183,6 +184,12 @@ EDAApplication >> commandDispatcher: anObject [
 ]
 
 { #category : #accessing }
+EDAApplication >> commandListenerErrorStrategySettingsPort [
+
+	^ self portSettingsPort commandListenerErrorStrategySettingsPort
+]
+
+{ #category : #accessing }
 EDAApplication >> commandListenerSettingsPort [
 	^ self resolveCommandListenerSettingsPort
 ]
@@ -226,7 +233,7 @@ EDAApplication >> doSetup [
 { #category : #accessing }
 EDAApplication >> environmentSettingsPort [
 
-	^   self portSettingsPort environmentSettingsPort 
+	^ self portSettingsPort environmentSettingsPort
 ]
 
 { #category : #accessing }
@@ -495,6 +502,11 @@ EDAApplication >> resetRepositories [
 { #category : #'reset - events' }
 EDAApplication >> resetSettingsAnnouncer [
 	self settingsAnnouncer: nil
+]
+
+{ #category : #accessing }
+EDAApplication >> resolveCommandListenerErrorStrategySettingsPort [
+	^ self resolveSettingsPort: EDASCommandListenerErrorStrategySettingsPort
 ]
 
 { #category : #accessing }
