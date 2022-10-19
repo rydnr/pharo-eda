@@ -36,10 +36,10 @@ Class {
 		'isStarted',
 		'projectorsByTenant',
 		'applicationName',
-		'portSettingsPort',
-		'environmentSettingsPort',
+		'portSettings',
+		'environmentSettings',
 		'environmentSettingsResolverPort',
-		'commandListenerErrorStrategySettingsPort',
+		'commandListenerSettings',
 		'settingsAnnouncer',
 		'eventStoreSettingsPort'
 	],
@@ -184,14 +184,18 @@ EDAApplication >> commandDispatcher: anObject [
 ]
 
 { #category : #accessing }
-EDAApplication >> commandListenerErrorStrategySettingsPort [
+EDAApplication >> commandListenerSettings [
 
-	^ self portSettingsPort commandListenerErrorStrategySettingsPort
+	^ self portSettings commandListenerSettings
 ]
 
 { #category : #accessing }
-EDAApplication >> commandListenerSettingsPort [
-	^ self resolveCommandListenerSettingsPort
+EDAApplication >> commandListenerSettings: anAdapter [
+
+	anAdapter = self portSettings commandListenerSettings
+		ifTrue: [ ^ self ]
+		ifFalse: [ 
+		self portSettings commandListenerSettings: anAdapter ]
 ]
 
 { #category : #'setup - events' }
@@ -206,9 +210,10 @@ EDAApplication >> configureProjectionBackendAuthentication: anObject [
 
 { #category : #'class initialization' }
 EDAApplication >> doInitialize [
+
 	self isStarted: false.
 	self isConfigured: false.
-	self resetPortSettingsPort.
+	self resetPortSettings.
 	self projectorsByTenant: Dictionary new.
 	self setupEventAnnouncer
 ]
@@ -231,15 +236,17 @@ EDAApplication >> doSetup [
 ]
 
 { #category : #accessing }
-EDAApplication >> environmentSettingsPort [
+EDAApplication >> environmentSettings [
 
-	^ self portSettingsPort environmentSettingsPort
+	^ self portSettings environmentSettings
 ]
 
 { #category : #accessing }
-EDAApplication >> environmentSettingsPort: anAdapter [
+EDAApplication >> environmentSettings: anAdapter [
 
-	anAdapter = self portSettingsPort environmentSettingsPort ifTrue: [ ^ self ] ifFalse: [ self portSettingsPort environmentSettingsPort: anAdapter ]
+	anAdapter = self portSettings environmentSettings
+		ifTrue: [ ^ self ]
+		ifFalse: [ self portSettings environmentSettings: anAdapter ]
 ]
 
 { #category : #accessing }
@@ -368,17 +375,20 @@ EDAApplication >> notifyEventStoreSettingsResolverPortListener: anAdapter [
 ]
 
 { #category : #accessing }
-EDAApplication >> portSettingsPort [
-	^ portSettingsPort
-		ifNil: [ | result |
-			result := EDASPortSettingsPort withAnnouncer: self settingsAnnouncer.
-			self portSettingsPort: result.
-			result ]
+EDAApplication >> portSettings [
+
+	^ portSettings ifNil: [ 
+		  | result |
+		  result := EDASPortSettingsPort withAnnouncer:
+			            self settingsAnnouncer.
+		  self portSettings: result.
+		  result ]
 ]
 
 { #category : #accessing }
-EDAApplication >> portSettingsPort: anAdapter [
-	portSettingsPort := anAdapter
+EDAApplication >> portSettings: anAdapter [
+
+	portSettings := anAdapter
 ]
 
 { #category : #accessing }
@@ -467,9 +477,9 @@ EDAApplication >> resetLogging [
 ]
 
 { #category : #reset }
-EDAApplication >> resetPortSettingsPort [
-	self
-		portSettingsPort: nil
+EDAApplication >> resetPortSettings [
+
+	self portSettings: nil
 ]
 
 { #category : #'reset - projections' }
@@ -502,11 +512,6 @@ EDAApplication >> resetRepositories [
 { #category : #'reset - events' }
 EDAApplication >> resetSettingsAnnouncer [
 	self settingsAnnouncer: nil
-]
-
-{ #category : #accessing }
-EDAApplication >> resolveCommandListenerErrorStrategySettingsPort [
-	^ self resolveSettingsPort: EDASCommandListenerErrorStrategySettingsPort
 ]
 
 { #category : #accessing }
