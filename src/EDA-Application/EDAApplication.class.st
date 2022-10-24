@@ -186,16 +186,17 @@ EDAApplication >> commandDispatcher: anObject [
 { #category : #accessing }
 EDAApplication >> commandListenerSettings [
 
-	^ self portSettings commandListenerSettings
+	^ commandListenerSettings ifNil: [ 
+		  | t |
+		  t := EDASPortResolver new resolvePort: EDASCommandListenerSettingsPort forApp: self.
+		  self commandListenerSettings: t.
+		  t ]
 ]
 
 { #category : #accessing }
 EDAApplication >> commandListenerSettings: anAdapter [
 
-	anAdapter = self portSettings commandListenerSettings
-		ifTrue: [ ^ self ]
-		ifFalse: [ 
-		self portSettings commandListenerSettings: anAdapter ]
+	commandListenerSettings := anAdapter
 ]
 
 { #category : #'setup - events' }
@@ -238,15 +239,17 @@ EDAApplication >> doSetup [
 { #category : #accessing }
 EDAApplication >> environmentSettings [
 
-	^ self portSettings environmentSettings
+	^ environmentSettings ifNil: [ 
+		  | t |
+		  t := EDASPortResolver new resolvePort:
+			        EDASEnvironmentSettingsPort forApp: self.
+		  self environmentSettings: t.
+		  t ]
 ]
 
 { #category : #accessing }
-EDAApplication >> environmentSettings: anAdapter [
-
-	anAdapter = self portSettings environmentSettings
-		ifTrue: [ ^ self ]
-		ifFalse: [ self portSettings environmentSettings: anAdapter ]
+EDAApplication >> environmentSettings: aValue [
+	environmentSettings := aValue
 ]
 
 { #category : #accessing }
@@ -386,7 +389,7 @@ EDAApplication >> portSettings [
 
 	^ portSettings ifNil: [ 
 		  | result |
-		  result := EDASPortSettingsPort withAnnouncer:
+		  result := EDASPortSettingsInMemoryAdapter withAnnouncer:
 			            self settingsAnnouncer.
 		  self portSettings: result.
 		  result ]
@@ -519,36 +522,6 @@ EDAApplication >> resetRepositories [
 { #category : #'reset - events' }
 EDAApplication >> resetSettingsAnnouncer [
 	self settingsAnnouncer: nil
-]
-
-{ #category : #accessing }
-EDAApplication >> resolveCommandListenerSettingsPort [
-	^ self resolveSettingsPort: EDASCommandListenerSettingsPort
-]
-
-{ #category : #accessing }
-EDAApplication >> resolveEnvironmentSettingsPort [
-	^ self resolveSettingsPort: EDASEnvironmentSettingsPort
-]
-
-{ #category : #accessing }
-EDAApplication >> resolveEventPublisherSettingsPort [
-	^ self resolveSettingsPort: EDASEventPublisherSettingsPort
-]
-
-{ #category : #accessing }
-EDAApplication >> resolveEventStoreSettingsPort [
-	^ self resolveSettingsPort: EDASEventStoreSettingsPort
-]
-
-{ #category : #accessing }
-EDAApplication >> resolveLoggingSettingsPort [
-	^ self resolveSettingsPort: EDASLoggingSettingsPort
-]
-
-{ #category : #accessing }
-EDAApplication >> resolveProjectionSettingsPort [
-	^ self resolveSettingsPort: EDASProjectionSettingsPort
 ]
 
 { #category : #accessing }
