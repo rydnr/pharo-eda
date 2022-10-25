@@ -37,11 +37,7 @@ Class {
 		'projectorsByTenant',
 		'applicationName',
 		'portSettings',
-		'environmentSettings',
-		'environmentSettingsResolverPort',
-		'commandListenerSettings',
-		'settingsAnnouncer',
-		'eventStoreSettingsPort'
+		'settingsAnnouncer'
 	],
 	#classVars : [
 		'ProjectionSynchronizationEnabled'
@@ -186,17 +182,7 @@ EDAApplication >> commandDispatcher: anObject [
 { #category : #accessing }
 EDAApplication >> commandListenerSettings [
 
-	^ commandListenerSettings ifNil: [ 
-		  | t |
-		  t := EDASPortResolver new resolvePort: EDASCommandListenerSettingsPort forApp: self.
-		  self commandListenerSettings: t.
-		  t ]
-]
-
-{ #category : #accessing }
-EDAApplication >> commandListenerSettings: anAdapter [
-
-	commandListenerSettings := anAdapter
+	^ self portSettings commandListenerSettings
 ]
 
 { #category : #'setup - events' }
@@ -239,17 +225,7 @@ EDAApplication >> doSetup [
 { #category : #accessing }
 EDAApplication >> environmentSettings [
 
-	^ environmentSettings ifNil: [ 
-		  | t |
-		  t := EDASPortResolver new resolvePort:
-			        EDASEnvironmentSettingsPort forApp: self.
-		  self environmentSettings: t.
-		  t ]
-]
-
-{ #category : #accessing }
-EDAApplication >> environmentSettings: aValue [
-	environmentSettings := aValue
+	^ self portSettings environmentSettings
 ]
 
 { #category : #accessing }
@@ -357,31 +333,13 @@ EDAApplication >> loggingSettingsPort [
 EDAApplication >> notifyEnvironmentChangedFrom: oldValue to: newValue [
 
 	self settingsAnnouncer announce:
-		(EDASEnvironmentChanged old: oldValue new: newValue on: self)
+		(EDASEnvironmentSettingsChanged old: oldValue new: newValue on: self)
 ]
 
 { #category : #accessing }
 EDAApplication >> notifyEnvironmentSettingsPortListener: anAdapter [
 	self settingsAnnouncer
 		announce: (EDASEnvironmentSettingsPortChanged with: anAdapter on: self)
-]
-
-{ #category : #accessing }
-EDAApplication >> notifyEnvironmentSettingsResolverPortListener: anAdapter [
-	self settingsAnnouncer
-		announce: (EDASEnvironmentSettingsResolverPortChanged with: anAdapter on: self)
-]
-
-{ #category : #accessing }
-EDAApplication >> notifyEventStoreSettingsPortListener: anAdapter [
-	self settingsAnnouncer
-		announce: (EDASEventStoreSettingsPortChanged with: anAdapter on: self)
-]
-
-{ #category : #accessing }
-EDAApplication >> notifyEventStoreSettingsResolverPortListener: anAdapter [
-	self settingsAnnouncer
-		announce: (EDASEventStoreSettingsResolverPortChanged with: anAdapter on: self)
 ]
 
 { #category : #accessing }
