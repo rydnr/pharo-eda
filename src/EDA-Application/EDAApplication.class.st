@@ -333,13 +333,7 @@ EDAApplication >> loggingSettingsPort [
 EDAApplication >> notifyEnvironmentChangedFrom: oldValue to: newValue [
 
 	self settingsAnnouncer announce:
-		(EDASEnvironmentSettingsChanged old: oldValue new: newValue on: self)
-]
-
-{ #category : #accessing }
-EDAApplication >> notifyEnvironmentSettingsPortListener: anAdapter [
-	self settingsAnnouncer
-		announce: (EDASEnvironmentSettingsPortChanged with: anAdapter on: self)
+		(EDASEnvironmentChanged old: oldValue new: newValue on: self)
 ]
 
 { #category : #accessing }
