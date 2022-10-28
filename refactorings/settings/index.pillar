@@ -7,3 +7,7 @@ ${inputFile:path=Chapters/Chapter06/06-port-resolver.pillar}$
 ${inputFile:path=Chapters/Chapter07/07-adapters-priority.pillar}$
 ${inputFile:path=Chapters/Chapter08/08-settings-announcements.pillar}$
 ${inputFile:path=Chapters/Chapter09/09-command-listener.pillar}$
+${inputFile:path=Chapters/Chapter10/10-command-listener-adapter-for-json-files.pillar}$
+${inputFile:path=Chapters/Chapter11/11-environment-selects-command-listener-adapter.pillar}$
+${inputFile:path=Chapters/Chapter12/12-discovering-ports.pillar}$
+${inputFile:path=Chapters/Chapter13/13-dynamically-adding-adapter-settings.pillar}$

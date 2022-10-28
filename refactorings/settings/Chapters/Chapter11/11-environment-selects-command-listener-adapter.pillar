@@ -1,0 +1,208 @@
+!! Environment selects the command listener adapter
+
+At this point, we don't want ==EDASSettingsPort== to provide the adapter for the command listener port. Instead, we want it to be derived by the environment adapter.
+If the environment is manually specified, the command listener adapter should be the ''InMemory'' one. If it's chosen from a list, the command listener settings will be read-only, and retrieved from a JSON file.
+
+!!! Removing the command listener port
+
+The command listener port cannot be chosen manually anymore. We need to remove that port in the Ports section of the settings.
+
+% ${changes:path=code/001-EDASSettings_portSettingsOn_under_on_order_.ombu}
+[[[methodDefinition=true
+EDASSettings class >> portSettingsOn: aBuilder under: aParent on: app order: anInteger
+
+	| entry environmentValues key portResolver commandListenerValues |
+	key := aParent , 'ports'.
+	entry := aBuilder group: key.
+	entry
+		label: 'Ports' translated;
+		parent: aParent.
+	portResolver := EDASPortResolver new.
+	environmentValues := OrderedCollection withAll:
+		                     ((portResolver
+			                       availableEnvironmentSettingsAdapters
+			                       collect: [ :adapterClass |
+			                       adapterClass description translated
+			                       -> adapterClass ]) sorted: [ :a :b | a < b ]).
+	(aBuilder pickOne: #environmentSettingsAdapterClass)
+		label: 'Environment adapter' translated;
+		target: app portSettings;
+		parent: key;
+		domainValues: environmentValues;
+		order: 1.
+	commandListenerValues := OrderedCollection withAll:
+		                         ((portResolver
+			                           availableCommandListenerSettingsAdapters
+			                           collect: [ :adapterClass |
+			                           adapterClass description translated
+			                           -> adapterClass ]) sorted: [ :a :b |
+			                          a < b ])
+]]]
+
+!!! Binding the command listener in-memory adapter to the environment in-memory adapter
+
+First things first. We'll leverage the announcements we prepared previously to implement this logic. The new event would be ==EDASEnvironmentChanged==.
+
+% ${changes:path=code/002-EDASEnvironmentChanged.ombu}
+[[[classDefinition=true
+EDASSettingsChanged subclass: #EDASEnvironmentChanged
+	instanceVariableNames: 'oldAdapterClass newAdapterClass'
+	classVariableNames: ''
+	package: 'EDAS-Settings'
+]]]
+
+In ==EDASEnvironmentSettingsInMemoryAdapter== we can now emit the event if the setting actually changes.
+
+% ${changes:path=code/003-EDASEnvironmentSettingsInMemoryAdapter_currentEnvironment_.ombu}
+[[[methodDefinition=true
+{ 'category': 'accessing' }
+EDASEnvironmentSettingsInMemoryAdapter >> currentEnvironment: anObject
+
+	| oldValue |
+	currentEnvironment ~= anObject ifFalse: [ ^ self ].
+	oldValue := currentEnvironment.
+	currentEnvironment := anObject.
+	self edaApplication
+		notifyEnvironmentChangedFrom: oldValue
+		to: anObject
+]]]
+
+The same applies to =EDASPredefinedEnvironmentSettingsInMemoryAdapter=.
+% ${changes:path=code/004-EDASPredefinedEnvironmentSettingsInMemoryAdapter_currentEnvironment_.ombu}
+[[[methodDefinition=true
+{ 'category': 'accessing' }
+EDASPredefinedEnvironmentSettingsInMemoryAdapter >> currentEnvironment: anObject
+
+	| oldValue |
+	currentEnvironment ~= anObject ifFalse: [ ^ self ].
+	oldValue := currentEnvironment.
+	currentEnvironment := anObject.
+	self edaApplication
+		notifyEnvironmentChangedFrom: oldValue
+		to: anObject
+]]]
+
+As you can see, we are relying upon the ==EDAApplication== instance to do it, because it has a reference to the ==EDASSettingsAnnouncer== instance, lazily initialized in its ''settingsAnnouncer:'' accessor.
+
+% ${changes:path=code/005-EDAApplication_notifyEnvironmentChangedFrom_to_.ombu}
+[[[methodDefinition=true
+{ 'category': 'events' }
+EDAApplication >> notifyEnvironmentChangedFrom: oldValue to: newValue
+
+	self settingsAnnouncer announce:
+		(EDASEnvironmentChanged old: oldValue new: newValue on: self)
+]]]
+
+Recall that ''setupListeners'' in ==EDASSettingsAnnouncer== finds out any class that uses ==EDASSettingsChangedListener== trait. Therefore, to react upon the new event we just need to create a class using that trait.
+
+% ${changes:path=code/006-EDASEnvironmentSwitchesToCommandListenerJsonAdapter.ombu}
+[[[classDefinition=true
+Object subclass: #EDASEnvironmentSwitchesToCommandListenerJsonAdapter
+	uses: EDASSettingsChangedListener
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'EDAS-Settings'
+]]]
+
+To make sure we're reacting upon =EDASEnvironmentChanged=, let's just reset the command listener settings adapter whenever the environment changes.
+
+% ${changes:path=code/007-EDASEnvironmentSwitchesToCommandListenerJsonAdapter_class_subscribeToSettingsChangedEventsIn_.ombu}
+[[[methodDefinition=true
+EDASEnvironmentSwitchesToCommandListenerJsonAdapter class >> subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
+
+	anEDASettingsAnnouncer when: EDASEnvironmentChanged do: [ :event |
+    	event edaApplication portSettings commandListenerSettings:
+			(EDASStompTopicListenerSettingsInMemoryAdapter withApp: event edaApp) ] ]
+]]]
+
+So far, if we change some of the command listener settings and afterwards we change the environment, those modifications are gone.
+
+!!! Updating the command listener settings based on the environment
+
+Now we are in position to update the command listener settings using the environment-specific values, available in the associated json files.
+
+Let's implement this, regardless of whether the command listener settings port is the json adapter or not. We'll deal with that later.
+
+We're missing a method to build a json adapter based on the environment value.
+
+% ${changes:path=code/008-EDASStompTopicListenerSettingsJsonAdapter_class_fromEnvironment_withApp_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter class forEnvironment: anEnvironment withApp: anEDAApplication
+
+	^ self fromFile:
+		  FileSystem workingDirectory / 'config' / (anEnvironment , '.json') withApp: anEDAApplication
+]]]
+
+% ${changes:path=code/009-EDASEnvironmentChangedListener_class_subscribeToSettingsChangedEventsIn_.ombu}
+[[[methodDefinition=true
+EDASEnvironmentChangedListener class >> subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
+
+	anEDASettingsAnnouncer when: EDASEnvironmentChanged do: [ :event |
+    	event edaApplication portSettings commandListenerSettings:
+			(EDASStompTopicListenerSettingsInMemoryAdapter forEnvironment: event newValue withApp: event edaApp) ] ]
+]]]
+
+Additionally, it'd be helpful if the json adapter can provide us a way to retrieve the available environments.
+
+% ${changes:path=code/010-EDASStompTopicListenerSettingsJsonAdapter_class_availableEnvironments.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter class >> availableEnvironments
+
+	| helper |
+	helper := EDACSourceCodeHelperStub new.
+	^ ((FileSystem workingDirectory / 'config') files
+		   select: [ :f | f pathString endsWith: '.json' ]
+		   thenCollect: [ :f |
+		   helper replace: '.json' with: '' inString: f asPath basename ])
+		  reversed
+]]]
+
+The ''reversed'' part has to do with the convention of using upper-cased names for expressing its importance, i.e., we'd use ==dev== instead of ==DEV==, ==PRO== instead of ==pro==.
+
+We can also update ==EDASPeedefinedEnvironmentSettingsInMemoryAdapter=='s ==availableEnvironments== to use the code above as well.
+
+% ${changes:path=code/011-EDASPredefinedEnvironmentSettingsInMemoryAdapter_class_availableEnvironments.ombu}
+[[[methodDefinition=true
+EDASPredefinedEnvironmentSettingsInMemoryAdapter class >> availableEnvironments
+
+	^ EDASStompTopicListenerSettingsJsonAdapter availableEnvironments
+]]]
+
+To finish this part, we could even switch to the json adapter whenever the environment the user specifies is one of the pre-existing ones, regardless of the environment settings adapter.
+
+% ${changes:path=code/012-EDASEnvironmentSwitchesToCommandListenerJsonAdapter_class_subscribeToSettingsChangedEventsIn_.ombu}
+[[[methodDefinition=true
+EDASEnvironmentSwitchesToCommandListenerJsonAdapter class >> subscribeToSettingsChangedEventsIn: anEDASettingsAnnouncer
+
+	anEDASettingsAnnouncer when: EDASEnvironmentChanged do: [ :event |
+		(EDASStompTopicListenerSettingsJsonAdapter supportsEnvironment:
+			 event newValue)
+			ifTrue: [
+				event edaApplication portSettings commandListenerSettings:
+					(EDASStompTopicListenerSettingsJsonAdapter
+						 forEnvironment: event newValue
+						 withApp: event edaApplication) ]
+			ifFalse: [
+				event edaApplication portSettings commandListenerSettings:
+					(EDASStompTopicListenerSettingsInMemoryAdapter withApp: event edaApplication) ] ]
+]]]
+
+However, when launching a new SettingsBrowser, we notice the environment is retrieved from the list of JSON files, but the command listener adapter is not the JSON's.
+One easy way to fix this is to emit an event when building the settings tree.
+
+[[[methodDefinition=true
+EDASSettings class >> environmentSettingsOn: aBuilder under: aParent on: app order: anInteger
+
+	self
+		settingOn: aBuilder
+		named: #currentEnvironment
+		labelled: 'Environment'
+		withDescription: 'Environment'
+		usingConfig: app environmentSettings
+		under: aParent
+		on: app
+		order: anInteger.
+	app
+		notifyEnvironmentChangedFrom: nil
+		to: app environmentSettings currentEnvironment
+]]]

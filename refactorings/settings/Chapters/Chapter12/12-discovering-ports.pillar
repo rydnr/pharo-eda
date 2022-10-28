@@ -1,0 +1,245 @@
+!! Discovering port
+
+There're a number of ports an =EDAApplication= needs: event publisher, event store, projections databases, and so on. Also, different =EDAApplication=s might need some of them, but not all, but we'll leave that for later.
+
+What we are pursuing first is to write a new port and adapter, and make it automatically appear in the SettingsBrowser.
+
+Recall that the logic that makes that happen is in =EDASettings class >> portSettingsPort:under:on:order:=:
+
+[[[methodDefinition=true
+EDASettings class >> portSettingsOn: aBuilder under: aParent on: app order: anInteger
+
+	| entry environmentValues key portResolver commandListenerValues |
+	key := aParent , 'ports'.
+	entry := aBuilder group: key.
+	entry
+		label: 'Ports' translated;
+		parent: aParent.
+	portResolver := EDASPortResolver new.
+	environmentValues := OrderedCollection withAll:
+		                     ((portResolver
+			                       availableEnvironmentSettingsAdapters
+			                       collect: [ :adapterClass |
+			                       adapterClass description translated
+			                       -> adapterClass ]) sorted: [ :a :b | a < b ]).
+	(aBuilder pickOne: #environmentSettingsAdapterClass)
+		label: 'Environment adapter' translated;
+		target: app portSettings;
+		parent: key;
+		domainValues: environmentValues;
+		order: 1.
+	commandListenerValues := OrderedCollection withAll:
+		                         ((portResolver
+			                           availableCommandListenerSettingsAdapters
+			                           collect: [ :adapterClass |
+			                           adapterClass description translated
+			                           -> adapterClass ]) sorted: [ :a :b |
+			                          a < b ]).
+	(aBuilder pickOne: #commandListenerSettingsAdapterClass)
+		label: 'Command Listener adapter' translated;
+		target: app portSettings;
+		parent: key;
+		domainValues: commandListenerValues;
+		order: 2
+]]]
+
+We could introduce an indirection in =EDASPortResolver= so it accepts a symbol:
+
+% ${changes:path=code/001-EDASSettings_portSettingsOn_under_on_order_.ombu}
+[[[methodDefinition=true
+EDASettings class >> portSettingsOn: aBuilder under: aParent on: app order: anInteger
+
+	| entry key portResolver |
+	key := aParent , 'ports'.
+	entry := aBuilder group: key.
+	entry
+		label: 'Ports' translated;
+		parent: aParent.
+	portResolver := EDASPortResolver new.
+	#( 'environment' 'commandListener' ) asOrderedCollection
+		keysAndValuesDo: [ :i :p |
+			| values |
+			values := OrderedCollection withAll:
+				          (((portResolver availableAdaptersFor: p) collect: [
+					            :adapterClass |
+					            adapterClass description translated -> adapterClass ])
+					           sorted: [ :a :b | a < b ]).
+			values ifNotEmpty: [
+				(aBuilder pickOne: (portResolver portAdapterClassSymbol: p))
+					label: (portResolver portDescription: p) translated;
+					target: app portSettings;
+					parent: key;
+					domainValues: values;
+					order: i ] ]
+]]]
+
+We've just introduced three new methods we need to implement, all in =EDASPortResolver=: =availableAdapters:=, =portToAdapterClassSymbol:= and =portDescription:=.
+To improve flexibility and decouple the ports and adapters from the base PharoEDA framework, we'll use Pragmas. Recall that Pragmas are method-level annotations. Let's start by annotating the existing ports. Since we are requesting each port its values, we can annotate that method directly.
+
+% ${changes:path=code/002-EDASEnvironmentSettingsPort_values_.ombu}
+[[[methodDefinition=true
+EDASEnvironmentSettingsPort >> values: aSymbol
+
+	<edaPort: #environment>
+	^ self availableEnvironments
+]]]
+
+Before continuing, let's create a test.
+
+% ${changes:path=code/003-EDASPortResolverTest.ombu}
+[[[classDefinition=true
+TestCase subclass: #EDASPortResolverTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'EDAS-Settings-Ports-Tests'
+]]]
+
+We now need to create the new package, and add it to the baseline. Don't forget to add it to the repository as well.
+
+% ${changes:path=code/004-BaselineOfPharoEDASettings_declarePackagesIn_.ombu}
+[[[methodDefinition=true
+BaselineOfPharoEDASettings >> declarePackagesIn: spec
+
+	spec
+		package: #'EDAS-Settings'
+		with: [ spec requires: #( 'DeployUtils' ) ];
+		package: #'EDAS-Settings-Tests'
+		with: [ spec requires: #( 'EDAS-Settings' ) ];
+		package: #'EDAS-Settings-Ports'
+		with: [ spec requires: #( 'PharoEDACommon' ) ];
+		package: #'EDAS-Settings-Adapters-InMemory'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Adapters-EnvVars'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Adapters-Json'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Adapters-Json-Tests'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Ports-Tests'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Adapters-ByPriority' with: [
+			spec requires:
+					#( 'PharoEDACommon' 'EDAS-Settings-Ports' 'EDAS-Settings-Adapters-InMemory'
+					   'EDAS-Settings-Adapters-EnvVars'
+					   'EDAS-Settings-Adapters-Json' ) ]
+]]]
+
+% ${changes:path=code/005-BaselineOfPharoEDASettings_declareGroupsIn_.ombu}
+[[[methodDefinition=true
+BaselineOfPharoEDASettings >> declareGroupsIn: spec
+
+	spec
+		group: 'core'
+		with:
+			#( #'EDAS-Settings' #'EDAS-Settings-Ports' #'EDAS-Settings-Adapters-InMemory'
+			   #'EDAS-Settings-Adapters-EnvVars'
+			   #'EDAS-Settings-Adapters-Json' #'EDAS-Settings-Adapters-ByPriority' );
+		group: 'tests'
+		with:
+			#( #'EDAS-Settings-Tests' #'EDAS-Settings-Adapters-Json-Tests'
+			   #'EDAS-Settings-Ports-Tests' );
+		group: 'default' with: #( 'core' 'tests' )
+]]]
+
+The first method to implement is =portAdapterClassSymbol:= in the port resolver trait. Let's start with a test.
+
+% ${changes:path=code/006-EDASPortResolverTest_testPortAdapterClassSymbol.ombu}
+[[[methodDefinition=true
+EDASPortResolverTest >> testPortAdapterClassSymbol
+
+	| sut |
+	sut := EDASPortResolver new.
+	self
+		assert: (sut portAdapterClassSymbol: #environment)
+		equals: #environmentSettingsAdapterClass
+]]]
+
+The implementation just defines the convention. No magic here.
+
+% ${changes:path=code/007-EDASTPortResolver_portAdapterClassSymbol_.ombu}
+[[[methodDefinition=true
+EDASTPortResolver >> portAdapterClassSymbol: aString
+
+	^ (aString , 'SettingsAdapterClass') asSymbol
+]]]
+
+The next method is responsible of providing a description.
+
+% ${changes:path=code/008-EDASPortResolverTest_testPortDescription.ombu}
+[[[methodDefinition=true
+EDASPortResolverTest >> testPortDescription
+
+	| sut |
+	sut := EDASPortResolver new.
+	self
+		assert: (sut portDescription: #environment)
+		equals: 'Environment'
+]]]
+
+In this case we are not going to impose any convention. Each port is responsible for providing its own description, using a pragma.
+
+% ${changes:path=code/009-EDASTPortResolver_availableAdaptersFor_.ombu}
+[[[methodDefinition=true
+EDASTPortResolver >> availableAdaptersFor: aSymbol
+
+	^ ((Pragma allNamed: #edaPort:as:)
+		   select: [ :p | p arguments first = aSymbol ]
+		   thenCollect: [ :p | p methodClass ]) asOrderedCollection
+]]]
+
+To make the tests pass, we need to add the annotation.
+
+% ${changes:path=code/010-EDASEnvironmentSettingsPort_values_.ombu}
+[[[methodDefinition=true
+EDASEnvironmentSettingsPort >> values: aSymbol
+
+	<edaPort: #environment as: 'Environment'>
+	^ self availableEnvironments
+]]]
+
+% ${changes:path=code/011-EDASTPortResolver_portDescription_.ombu}
+[[[methodDefinition=true
+EDASTPortResolver >> portDescription: aSymbol
+
+	^ ((Pragma allNamed: #edaPort:as:)
+		   select: [ :p | p arguments first = aSymbol ]
+		   thenCollect: [ :p | p arguments second ]) asOrderedCollection
+		  ifEmpty: [ nil ]
+		  ifNotEmpty: [ :c | c first ]
+]]]
+
+% ${changes:path=code/012-EDASPortResolverTest_testAvailableAdaptersFor.ombu}
+[[[methodDefinition=true
+EDASPortResolverTest >> testAvailableAdaptersFor
+
+	| sut |
+	sut := EDASPortResolver new.
+	self
+		assert: (sut availableAdaptersFor: #environment)
+		equals: (OrderedCollection withAll:
+				 (sut availableAdaptersForPort: EDASEnvironmentSettingsPort))
+]]]
+
+The implementation is similar as the =portDescription:= we did previously.
+
+% ${changes:path=code/013-EDASTPortResolver_availableAdaptersFor_.ombu}
+[[[methodDefinition=true
+EDASTPortResolver >> availableAdaptersFor: aSymbol
+
+	^ ((Pragma allNamed: #edaPort:as:)
+		   select: [ :p | p arguments first = aSymbol ]
+		   thenCollect: [ :p | p methodClass ]) asOrderedCollection
+		  ifEmpty: [ OrderedCollection new ]
+		  ifNotEmpty: [ :c | self availableAdaptersForPort: c first ]
+]]]
+
+If we launch now a SettingBrowser we can check the environment port is detected.
+The command listener is not yet, since we haven't added the pragma to the port. In this case, we'll add it to another method.
+
+% ${changes:path=code/014-EDASCommandListenerSettingsPort_availableErrorStrategies.ombu}
+[[[methodDefinition=true
+EDASCommandListenerSettingsPort >> availableErrorStrategies
+
+	<edaPort: #commandListener as: 'Command listener'>
+	self subclassResponsibility
+]]]

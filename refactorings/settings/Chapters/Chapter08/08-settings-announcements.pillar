@@ -1,6 +1,6 @@
 !! Announcing setting changes
 
-Now, once an ==EDAApplication== is created, it will access its configuration settings via ''portSettingsPort''. If it's not configured via ==EDASettings== (==SettingBrowser==), ==EDAPortSettingsPort== will use ==EDAPortResolver== and provide a suitable adapter to store each ==EDAApplication== setting.
+Now, once an ==EDAApplication== is created, it will access its configuration settings via ''portSettings''. If it's not configured via ==EDASettings== (==SettingBrowser==), ==EDAPortSettingsPort== will use ==EDAPortResolver== and provide a suitable adapter to store each ==EDAApplication== setting.
 
 What happens if we change the class of the adapter using ==SettingBrowser==? Right now, nothing. The ==EDAApplication== doesn't notice. In other words, it doesn't have any effect. Well, ==EDAPortSettingsPort== will refer to an instance in ''environmentSettingsPort'' which won't necessarily match the ''environmentSettingsAdapterClass'' class.
 
@@ -129,6 +129,7 @@ setupAnnouncer: anAnnouncer application: anEDAApplication
 ]]]
 
 We now need to refresh any open ==SettingBrowser== windows.
+
 % ${changes:path=code/015-EDASettingsSubscriber_onEnvironmentSettingsAdapterClassChanged_on_.ombu}
 [[[methodDefinition=true
 onEnvironmentSettingsAdapterClassChanged: anEvent on: anEDAApplication
@@ -141,7 +142,7 @@ The last piece involves ==EDAApplication==. Whenever the adapter class changes, 
 [[[classDefinition=true
 Object subclass: #EDAApplication
 	uses: EDATLogging
-	instanceVariableNames: 'commandConsumer commandDispatcher eventAnnouncer eventProducer eventStore isConfigured isStarted projectorsByTenant applicationName portSettingsPort environmentSettingsPort settingsAnnouncer'
+	instanceVariableNames: 'commandConsumer commandDispatcher eventAnnouncer eventProducer eventStore isConfigured isStarted projectorsByTenant applicationName portSettings environmentSettingsPort settingsAnnouncer'
 	classVariableNames: 'ProjectionSynchronizationEnabled'
 	package: 'EDA-Application'
 ]]]
@@ -167,7 +168,7 @@ On the other hand, ==EDAApplication== is interested in reacting upon changes in 
 [[[classDefinition=true
 Object subclass: #EDAApplication
 	uses: EDATLogging
-	instanceVariableNames: 'commandConsumer commandDispatcher eventAnnouncer eventProducer eventStore isConfigured isStarted projectorsByTenant applicationName portSettingsPort environmentSettingsPort settingsAnnouncer settingsSubscriber'
+	instanceVariableNames: 'commandConsumer commandDispatcher eventAnnouncer eventProducer eventStore isConfigured isStarted projectorsByTenant applicationName portSettings environmentSettingsPort settingsAnnouncer settingsSubscriber'
 	classVariableNames: 'ProjectionSynchronizationEnabled'
 	package: 'EDA-Application'
 ]]]
@@ -204,12 +205,12 @@ setupSettingsSubscriptions
 		application: self
 ]]]
 
-To ensure the ''portSettingsPort'' attribute of ==EDAApplication== is initialized properly, let's add a new method.
+To ensure the ''portSettings'' attribute of ==EDAApplication== is initialized properly, let's add a new method.
 
-% ${changes:path=code/024-EDAApplication_resetPortSettingsPort.ombu}
+% ${changes:path=code/024-EDAApplication_resetPortSettings.ombu}
 [[[methodDefinition=true
-resetPortSettingsPort
-	self portSettingsPort: EDAPortSettingsPort new
+resetPortSettings
+	self portSettings: EDAPortSettingsPort new
 ]]]
 
 Finally, ==EDAApplication== initialization process should include setting up the announcer and subscriber of settings events.
@@ -219,7 +220,7 @@ Finally, ==EDAApplication== initialization process should include setting up the
 doInitialize
 	self isStarted: false.
 	self isConfigured: false.
-	self resetPortSettingsPort.
+	self resetPortSettings.
 	self projectorsByTenant: Dictionary new.
 	self setupSettingsAnnouncer.
 	self setupEventAnnouncer.
@@ -230,7 +231,7 @@ We now need to emit an event whenever the class of the ''environment'' adapter c
 
 Let's recap for a second the responsibilities of each one:
 - ==EDAApplication==: The root of the setting tree, the scope of related settings.
-- ==EDASettingsSubscriber==: Registers hooks in ==EDAApplication== whenever settings changes.
+- ==EDASettingsSubscriber==: Registers hooks in ==EDAApplication== whenever settings change.
 - ==EDAPortSettingsPort==: Holds which adapter is used for each setting, which is itself a setting.
 - ==EDASettingsChanged==: The event to emit when a setting changes, which includes the reference to the ==EDAApplication==.
 
@@ -269,7 +270,7 @@ forApp: anEDAApplication
 		yourself
 ]]]
 
-==EDAApplication== now can create instances of this class, instead of plain ==Announcer==:
+==EDAApplication== now can create instances of this class, instead of plain ==Announcer==s:
 
 % ${changes:path=code/030-EDAApplication_settingsAnnouncer.ombu}
 [[[methodDefinition=true
@@ -316,17 +317,17 @@ We need to skip setting up the settings subscriber in the initialization phase o
 doInitialize
 	self isStarted: false.
 	self isConfigured: false.
-	self resetPortSettingsPort.
+	self resetPortSettings.
 	self projectorsByTenant: Dictionary new.
 	self setupEventAnnouncer
 ]]]
 
 The next thing to do is to make sure ==EDAApplication== creates ==EDAPortSettingsPort== using the announcer.
 
-% ${changes:path=code/036-EDAApplication_portSettingsPort.ombu}
+% ${changes:path=code/036-EDAApplication_portSettings.ombu}
 [[[methodDefinition=true
-portSettingsPort
-	^ portSettingsPort
+portSettings
+	^ portSettings
 		ifNil: [ | result |
 			result := EDAPortSettingsPort withAnnouncer: self settingsAnnouncer.
 			self portSettingsPort: result.

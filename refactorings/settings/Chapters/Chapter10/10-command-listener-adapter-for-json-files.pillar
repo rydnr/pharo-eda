@@ -1,0 +1,734 @@
+!! Command listener adapter for JSON files
+
+We'll start defining a test class:
+
+% ${changes:path=code/001-EDASStompTopicListenerSettingsJsonAdapterTest.ombu}
+[[[classDefinition=true
+TestCase subclass: #EDASStompTopicListenerSettingsJsonAdapterTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	package: 'EDAS-Settings-Adapters-Json-Tests'
+]]]
+
+It's a new package, so we need to make sure to add it to the baseline. Remember to right-click on it an choose "Promote as package", and then add the package to the repository in Iceberg.
+
+% ${changes:path=code/002-BaselineOfPharoEDASettings_declarePackagesIn_.ombu}
+[[[methodDefinition=true
+declarePackagesIn: spec
+
+	spec
+		package: #'EDAS-Settings'
+		with: [ spec requires: #( 'DeployUtils' ) ];
+		package: #'EDAS-Settings-Tests'
+		with: [ spec requires: #( 'EDAS-Settings' ) ];
+		package: #'EDAS-Settings-Ports'
+		with: [ spec requires: #( 'PharoEDACommon' ) ];
+		package: #'EDAS-Settings-Adapters-InMemory'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Adapters-EnvVars'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Adapters-Json-Tests'
+		with: [ spec requires: #( 'PharoEDACommon' 'EDAS-Settings-Ports' ) ];
+		package: #'EDAS-Settings-Adapters-ByPriority' with: [
+			spec requires:
+					#( 'PharoEDACommon' 'EDAS-Settings-Ports' 'EDAS-Settings-Adapters-InMemory'
+					   'EDAS-Settings-Adapters-EnvVars' ) ]
+]]]
+
+% ${changes:path=code/003-BaselineOfPharoEDASettings_declareGroupsIn_.ombu}
+[[[methodDefinition=true
+declareGroupsIn: spec
+
+	spec
+		group: 'core'
+		with:
+			#( #'EDAS-Settings' #'EDAS-Settings-Ports' #'EDAS-Settings-Adapters-InMemory'
+			   #'EDAS-Settings-Adapters-EnvVars'
+			   #'EDAS-Settings-Adapters-ByPriority' );
+		group: 'tests'
+		with:
+			#( #'EDAS-Settings-Tests' #'EDAS-Settings-Adapters-Json-Tests' );
+		group: 'default' with: #( 'core' 'tests' )
+]]]
+
+Our first test would be simple:
+
+% ${changes:path=code/004-EDASStompTopicListenerSettingsJsonAdapterTest_testHost_localhost.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapterTest >> testHost_localhost
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := Dictionary new.
+	commandListener at: 'host' put: 'localhost'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) host
+			= 'localhost'
+		description: 'Host parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+This test would trigger the dialog allowing you to create the new ==EDASStompTopicListenerSettingsJsonAdapter== class:
+
+% ${changes:path=code/005-EDASStompTopicListenerSettingsJsonAdapter.ombu}
+[[[classDefinition=true
+Object subclass: #EDASStompTopicListenerSettingsJsonAdapter
+    uses: EDASSettingsPort
+	instanceVariableNames: 'host port user password timeout queue prefetchCount ack debug durable restartOnErrors errorStrategyName edaApplication'
+	classVariableNames: ''
+	package: 'EDAS-Settings-Adapters-Json'
+]]]
+
+Let's generate the accessors now.
+
+% ${changes:path=code/006-EDASStompTopicListenerSettingsJsonAdapter_host.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> host
+    ^ host
+]]]
+
+% ${changes:path=code/007-EDASStompTopicListenerSettingsJsonAdapter_host_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> host: aString
+    host := aString
+]]]
+
+% ${changes:path=code/008-EDASStompTopicListenerSettingsJsonAdapter_host.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> port
+    ^ port
+]]]
+
+% ${changes:path=code/009-EDASStompTopicListenerSettingsJsonAdapter_port_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> port: anInteger
+    port := anInteger
+]]]
+
+% ${changes:path=code/010-EDASStompTopicListenerSettingsJsonAdapter_user.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> user
+    ^ user
+]]]
+
+% ${changes:path=code/011-EDASStompTopicListenerSettingsJsonAdapter_user_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> user: aString
+    user := aString
+]]]
+
+% ${changes:path=code/012-EDASStompTopicListenerSettingsJsonAdapter_password.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> password
+    ^ password
+]]]
+
+% ${changes:path=code/013-EDASStompTopicListenerSettingsJsonAdapter_password_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> password: aString
+    password := aString
+]]]
+
+% ${changes:path=code/014-EDASStompTopicListenerSettingsJsonAdapter_queue.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> queue
+    ^ queue
+]]]
+
+% ${changes:path=code/015-EDASStompTopicListenerSettingsJsonAdapter_queue_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> queue: aString
+    queue := aString
+]]]
+
+% ${changes:path=code/016-EDASStompTopicListenerSettingsJsonAdapter_ack.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> ack
+    ^ ack
+]]]
+
+% ${changes:path=code/017-EDASStompTopicListenerSettingsJsonAdapter_ack_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> ack: aString
+    ack := aString
+]]]
+
+% ${changes:path=code/018-EDASStompTopicListenerSettingsJsonAdapter_timeout.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> timeout
+    ^ timeout
+]]]
+
+% ${changes:path=code/019-EDASStompTopicListenerSettingsJsonAdapter_timeout_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> timeout: anInteger
+    timeout := anInteger
+]]]
+
+% ${changes:path=code/020-EDASStompTopicListenerSettingsJsonAdapter_prefetchCount.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> prefetchCount
+    ^ prefetchCount
+]]]
+
+% ${changes:path=code/021-EDASStompTopicListenerSettingsJsonAdapter_prefetchCount_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> prefetchCount: anInteger
+    prefetchCount := anInteger
+]]]
+
+% ${changes:path=code/022-EDASStompTopicListenerSettingsJsonAdapter_debug.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> debug
+    ^ debug
+]]]
+
+% ${changes:path=code/023-EDASStompTopicListenerSettingsJsonAdapter_debug_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> debug: aBoolean
+    debug := aBoolean
+]]]
+
+% ${changes:path=code/024-EDASStompTopicListenerSettingsJsonAdapter_durable.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> durable
+    ^ durable
+]]]
+
+% ${changes:path=code/025-EDASStompTopicListenerSettingsJsonAdapter_durable_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> durable: aBoolean
+    durable := aBoolean
+]]]
+
+% ${changes:path=code/026-EDASStompTopicListenerSettingsJsonAdapter_restartOnErrors.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> restartOnErrors
+    ^ restartOnErrors
+]]]
+
+% ${changes:path=code/027-EDASStompTopicListenerSettingsJsonAdapter_restartOnErrors_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> restartOnErrors: aBoolean
+    restartOnErrors := aBoolean
+]]]
+
+% ${changes:path=code/028-EDASStompTopicListenerSettingsJsonAdapter_errorStrategyName.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> errorStrategyName
+    ^ errorStrategyName
+]]]
+
+% ${changes:path=code/029-EDASStompTopicListenerSettingsJsonAdapter_errorStrategyName_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> errorStrategyName: aString
+    errorStrategyName := aString
+]]]
+
+% ${changes:path=code/030-EDASStompTopicListenerSettingsJsonAdapter_edaApplication.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> edaApplication
+    ^ edaApplication
+]]]
+
+% ${changes:path=code/031-EDASStompTopicListenerSettingsJsonAdapter_edaApplication_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter >> edaApplication: anObject
+    edaApplication := anObject
+]]]
+
+Running the test again will make Pharo suggest to create the missing ''fromFile:withApp:'' method for you.
+
+% ${changes:path=code/032-EDASStompTopicListenerSettingsJsonAdapter_class_fromFile_withApp_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter class >> fromFile: aFileReference withApp: anEDAApplication
+
+	| result json commandListener |
+	result := self withApp: anEDAApplication.
+	result host: 'localhost'.
+	^ result
+]]]
+
+Now that the test passes with the naive implementation, it's time to define a new test.
+
+% ${changes:path=code/033-EDASStompTopicListenerSettingsJsonAdapterTest_testHost_127_0_0_1_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapterTest >> testHost_127_0_0_1
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := Dictionary new.
+	commandListener at: 'host' put: '127.0.0.1'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) host
+			= '127.0.0.1'
+		description: 'Host parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+The new test will fail, forcing us to actually read the JSON file.
+
+% ${changes:path=code/034-EDASStompTopicListenerSettingsJsonAdapter_class_fromFile_withApp_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter class >> fromFile: aFileReference withApp: anEDAApplication
+
+	| result json commandListener |
+	result := self withApp: anEDAApplication.
+	json := (NeoJSONReader on: aFileReference readStream) next.
+	commandListener := json at: 'commandListener'.
+	result host: (commandListener at: 'host').
+	^ result
+]]]
+
+Let's do the same for the other fields, skipping the naive implementations altogether.
+
+% ${changes:path=code/035-EDASStompTopicListenerSettingsJsonAdapterTest_testPort.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapterTest >> testPort
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := Dictionary new.
+	commandListener at: 'port' put: 61613.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) port
+			= 61613
+		description: 'Port parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+The test fails because we're not reading the port setting from the json.
+
+% ${changes:path=code/036-EDASStompTopicListenerSettingsJsonAdapter_class_fromFile_withApp_.ombu}
+[[[methodDefinition=true
+EDASStompTopicListenerSettingsJsonAdapter class >> fromFile: aFileReference withApp: anEDAApplication
+
+	| result json commandListener |
+	result := self withApp: anEDAApplication.
+	json := (NeoJSONReader on: aFileReference readStream) next.
+	commandListener := json at: 'commandListener'.
+	result host: (commandListener at: 'host').
+	result port: (commandListener at: 'port').
+	^ result
+]]]
+
+The new test passes, but the previous ones now fail because we are trying to read the port information, and we're not including it in the temporary files within the host tests.
+
+Since this will happen for all settings, let's use a method to build a dictionary with the default values to include in the JSON file used in the tests.
+
+% ${changes:path=code/037-EDASStompTopicListenerSettingsJsonAdapterTest_defaultCommandListener_.ombu}
+[[[methodDefinition=true
+{ category: 'helpers' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> defaultCommandListener
+
+	| result |
+	result := Dictionary new.
+	result
+		at: 'host' put: 'localhost';
+		at: 'port' put: 61613;
+		at: 'user' put: 'user1';
+		at: 'password' put: 'secret';
+		at: 'queue' put: 'pharoeda';
+		at: 'durable' put: true;
+		at: 'ack' put: 'client-individual';
+		at: 'prefetchCount' put: 1;
+		at: 'timeout' put: 60;
+		at: 'debug' put: true;
+		at: 'restartOnErrors' put: true;
+		at: 'errorStrategyName' put: 'EDAEJustLogErrorStrategy'.
+	^ result
+]]]
+
+The new tests are, then.
+
+% ${changes:path=code/038-EDASStompTopicListenerSettingsJsonAdapterTest_testHost_localhost.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testHost_localhost
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'host' put: 'localhost'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) host
+			= (commandListener at: 'host')
+		description: 'Host parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/039-EDASStompTopicListenerSettingsJsonAdapterTest_testHost_127_0_0_1.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testHost_127_0_0_1
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'host' put: '127.0.0.1'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) host
+			= (commandListener at: 'host')
+		description: 'Host parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/040-EDASStompTopicListenerSettingsJsonAdapterTest_testPort.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testPort
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'port' put: 61614.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) port
+			= (commandListener at: 'port')
+		description: 'Port parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+All tests should be green now, allowing us to continue with the ''user'' setting.
+
+% ${changes:path=code/041-EDASStompTopicListenerSettingsJsonAdapterTest_testUser.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testUser
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'user' put: 'johnsmith'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) user
+			= (commandListener at: 'user')
+		description: 'User parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+The test fails, but gets fixed just by adding the new attribute when creating the adapter. However, at the expense of bypassing the attribute accessors, we can simplify our life a bit by filling all values automatically, regardless of their names.
+
+% ${changes:path=code/042-EDASStompTopicListenerSettingsJsonAdapter_class_fromFile_withApp_.ombu}
+[[[methodDefinition=true
+{ category: 'instance creation' }
+EDASStompTopicListenerSettingsJsonAdapter class >> fromFile: aFileReference withApp: anEDAApplication
+
+	| result json commandListener |
+	result := self withApp: anEDAApplication.
+	json := (NeoJSONReader on: aFileReference readStream) next.
+	commandListener := json at: 'commandListener'.
+	commandListener keysAndValuesDo: [ :k :v |
+		result instVarNamed: k put: v ].
+	^ result
+]]]
+
+The test should pass now, as the following ones.
+
+% ${changes:path=code/043-EDASStompTopicListenerSettingsJsonAdapterTest_testPassword.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testPassword
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'password' put: 'whatever'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) password
+			= (commandListener at: 'password')
+		description: 'Password parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/044-EDASStompTopicListenerSettingsJsonAdapterTest_testTimeout.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testTimeout
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'timeout' put: 33.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) timeout
+			= (commandListener at: 'timeout')
+		description: 'Timeout parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/045-EDASStompTopicListenerSettingsJsonAdapterTest_testQueue.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testQueue
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'queue' put: 'myQueue'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) queue
+			= (commandListener at: 'queue')
+		description: 'Queue parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/046-EDASStompTopicListenerSettingsJsonAdapterTest_testPrefetchCount.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testPrefetchCount
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'prefetchCount' put: 11.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) prefetchCount
+			= (commandListener at: 'prefetchCount')
+		description: 'PrefetchCount parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/047-EDASStompTopicListenerSettingsJsonAdapterTest_testAck.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testAck
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'ack' put: 'auto'.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) ack
+			= (commandListener at: 'ack')
+		description: 'Ack parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/048-EDASStompTopicListenerSettingsJsonAdapterTest_testDebug.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testDebug
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'debug' put: false.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) debug
+			= (commandListener at: 'debug')
+		description: 'Debug parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/049-EDASStompTopicListenerSettingsJsonAdapterTest_testDurable.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testDurable
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'durable' put: (commandListener at: 'durable') not.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) durable
+			= (commandListener at: 'durable')
+		description: 'Durable parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
+
+% ${changes:path=code/050-EDASStompTopicListenerSettingsJsonAdapterTest_testRestartOnErrors.ombu}
+[[[methodDefinition=true
+{ category: 'tests' }
+EDASStompTopicListenerSettingsJsonAdapterTest >> testRestartOnErrors
+
+	| json dict tempFile commandListener |
+	tempFile := FileReference
+		            newTempFilePrefix:
+		            'EDASStompTopicListenerSettingsJsonAdapterTest'
+		            suffix: '.json'.
+	commandListener := self defaultCommandListener.
+	commandListener at: 'restartOnErrors' put: (commandListener at: 'restartOnErrors') not.
+	dict := Dictionary new.
+	dict at: 'commandListener' put: commandListener.
+	json := String streamContents: [ :stream |
+		        (NeoJSONWriter on: stream)
+			        asciiOnly: true;
+			        nextPut: dict ].
+	tempFile writeStreamDo: [ :s | s nextPutAll: json ].
+	self
+		assert:
+			(EDASStompTopicListenerSettingsJsonAdapter fromFile: tempFile withApp: nil) restartOnErrors
+			= (commandListener at: 'restartOnErrors')
+		description: 'RestartOnErrors parsing failed'
+		resumable: true.
+	tempFile delete
+]]]
