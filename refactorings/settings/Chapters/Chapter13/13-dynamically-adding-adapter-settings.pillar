@@ -1,3 +1,255 @@
 !! Dynamically adding adapter settings
 
-TODO
+It feels as if we were close to what we try to achieve. Our focus now is this method in =EDASSettings=:
+
+% ${changes:path=code/001-EDASSettings_class_edaSettingsOn_for_under_.ombu}$
+[[[methodDefinition=true
+EDASSettings class >> edaSettingsOn: aBuilder for: anEDAApplication under: aSymbol
+
+	| parent parentGroup |
+	parent := anEDAApplication applicationName.
+	parentGroup := aBuilder group: parent.
+	parentGroup
+		label: parent translated;
+		parent: aSymbol;
+		description: parent;
+		noOrdering.
+	self
+		environmentSettingsOn: aBuilder
+		under: parent
+		on: anEDAApplication
+		order: 1.
+	self
+		commandListenerSettingsOn: aBuilder
+		under: parent
+		on: anEDAApplication
+		order: 2.
+	self
+		portSettingsOn: aBuilder
+		under: parent
+		on: anEDAApplication
+		order: 3
+]]]
+
+!!! Making dynamic the simplest case
+
+The first method we want to make dynamic is the following.
+
+% ${changes:path=code/002-EDASSettings_class_environmentSettingsOn_under_on_.ombu}$
+[[[methodDefinition=true
+EDASSettings class >> environmentSettingsOn: aBuilder under: aParent on: app order: anInteger
+
+	self
+		settingOn: aBuilder
+		named: #currentEnvironment
+		labelled: 'Environment'
+		withDescription: 'Environment'
+		usingConfig: app environmentSettings
+		under: aParent
+		on: app
+		order: anInteger.
+	app
+		notifyEnvironmentChangedFrom: nil
+		to: app environmentSettings currentEnvironment
+]]]
+
+We'd need to add the following information as part of the port metadata:
+- the attribute name (=#currentEnvironment=
+- the port name (='Environment')
+- the port description (='Environment' in this case)
+- a block to access the settings instance from the =EDAApplication= itself ('app environmentSettings')
+- an optional hook to perform additional logic (=app notifyEnvironmentChangedFrom:to:= in this case)
+
+The new method, as far as we can tell right now, could be as simple as the following.
+
+% ${changes:path=code/003-EDASSettings_class_adapterSettingsOn_for_under_on_order_.ombu}$
+[[[methodDefinition=true
+EDASSettings class >> edaSettingsOn: aBuilder for: anEDAApplication under: aSymbol
+EDASSettings class >> adapterSettingsOn: aBuilder for: aPort under: aParent on: app order: anInteger
+
+	self
+		settingOn: aBuilder
+		named: aPort selector
+		labelled: aPort label
+		withDescription: aPort description
+		usingConfig: app environmentSettings
+		under: aParent
+		on: app
+		order: anInteger.
+	aPort settingsBlock value: app
+]]]
+
+Focusing on the environment adapter, the method can be rewritten as:
+
+% ${changes:path=code/004-EDASSettings_class_environmentSettingsOn_under_on_.ombu}$
+[[[methodDefinition=true
+EDASSettings class >> edaSettingsOn: aBuilder for: anEDAApplication under: aSymbol
+
+	| parent parentGroup |
+	parent := anEDAApplication applicationName.
+	parentGroup := aBuilder group: parent.
+	parentGroup
+		label: parent translated;
+		parent: aSymbol;
+		description: parent;
+		noOrdering.
+	self
+		adapterSettingsOn: aBuilder
+		for: EDASEnvironmentSettingsPort
+		under: parent
+		on: anEDAApplication
+		order: 1.
+	self
+		portSettingsOn: aBuilder
+		under: parent
+		on: anEDAApplication
+		order: 2
+]]
+
+Now it's just a matter of implementing the new methods in =EDASEnvironmentSettingsPort=.
+
+% ${changes:path=code/005-EDASEnvironmentSettingsPort_class_selector.ombu}$
+[[[methodDefinition=true
+EDASEnvironmentSettingsPort class >> selector
+
+	^ #currentEnvironment
+]]]
+
+% ${changes:path=code/006-EDASEnvironmentSettingsPort_class_label.ombu}$
+[[[methodDefinition=true
+EDASEnvironmentSettingsPort class >> label
+
+	^ 'Environment'
+]]]
+
+% ${changes:path=code/007-EDASEnvironmentSettingsPort_class_description.ombu}$
+[[[methodDefinition=true
+EDASEnvironmentSettingsPort class >> description
+
+	^ 'Environment'
+]]]
+
+% ${changes:path=code/007-EDASEnvironmentSettingsPort_class_description.ombu}$
+[[[methodDefinition=true
+EDASEnvironmentSettingsPort class >> settingsBlock
+
+	^ [ :app |
+	  app
+		  notifyEnvironmentChangedFrom: nil
+		  to: app environmentSettings currentEnvironment ]
+]]]
+
+If we open a new SettingsBrowser, it should display the environment adapter as before.
+
+!!! Making dynamic a non-trivial case
+
+For the command line adapter, the method to export its attributes as settings is more involved.
+
+[[[methodDefinition=true
+EDASSettings class >> commandListenerSettingsOn: aBuilder under: parent on: app order: anInteger
+
+	| key |
+	key := parent , 'commandListener'.
+	(aBuilder group: key)
+		label: 'Command Listener' translated;
+		description: 'Command listener';
+		parent: parent;
+		order: anInteger.
+	self
+		settingOn: aBuilder
+		named: #host
+		labelled: 'Host'
+		withDescription: 'Stomp host address / IP'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 1.
+	self
+		settingOn: aBuilder
+		named: #port
+		labelled: 'Port'
+		withDescription: 'Stomp host port'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 2.
+	self
+		settingOn: aBuilder
+		named: #user
+		labelled: 'User'
+		withDescription: 'Stomp user'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 3.
+	self
+		settingOn: aBuilder
+		named: #password
+		labelled: 'Password'
+		withDescription: 'Stomp password'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 4.
+	self
+		settingOn: aBuilder
+		named: #queue
+		labelled: 'Queue'
+		withDescription: 'Stomp queue'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 5.
+	self
+		settingOn: aBuilder
+		named: #timeout
+		labelled: 'Timeout'
+		withDescription: 'Stomp timeout'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 5.
+	self
+		settingOn: aBuilder
+		named: #prefetchCount
+		labelled: 'Prefetch count'
+		withDescription: 'The number of messages to prefetch'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 6.
+	self
+		settingOn: aBuilder
+		named: #durable
+		labelled: 'Durable'
+		withDescription: 'Whether the topic is durable'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 7.
+	self
+		settingOn: aBuilder
+		named: #debug
+		labelled: 'Debug'
+		withDescription: 'Whether to enable debug mode'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 8.
+	self
+		commandListenerErrorStrategySettingsOn: aBuilder
+		under: key
+		on: app
+		order: 9.
+	self
+		settingOn: aBuilder
+		named: #restartOnErrors
+		labelled: 'Restart on errors'
+		withDescription: 'Whether to restart the listener in case of errors'
+		usingConfig: app commandListenerSettings
+		under: key
+		on: app
+		order: 10
+]]]
+
+Basically, we need a way to iterate over the adapter's attributes. We could annotate their accessor methods, but first we need to be able to distinguish between the simple and not-so-simple cases.
