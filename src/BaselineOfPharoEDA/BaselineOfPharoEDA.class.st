@@ -142,5 +142,7 @@ spec
 { #category : #baselines }
 BaselineOfPharoEDA >> postload: loader package: packageSpec [
 
-	self halt	
+	EDAIconProvider iconsFolder:
+		(IceRepository registry detect: [ :each | each name = 'pharo-eda' ])
+			location / 'resources' / 'icons'
 ]
