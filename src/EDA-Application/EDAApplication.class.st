@@ -37,7 +37,8 @@ Class {
 		'projectorsByTenant',
 		'applicationName',
 		'portSettings',
-		'settingsAnnouncer'
+		'settingsAnnouncer',
+		'description'
 	],
 	#classVars : [
 		'ProjectionSynchronizationEnabled'
@@ -149,6 +150,18 @@ EDAApplication class >> withName: anApplicationName [
 	^ result
 ]
 
+{ #category : #'instance creation' }
+EDAApplication class >> withName: anApplicationName andDescription: aDescription [
+	| result |
+	(EDAApplications uniqueInstance edaApplications
+		select: [ :app | app applicationName = anApplicationName ])
+		ifEmpty: [ result := self basicNew initialize.
+			result applicationName: anApplicationName; description: aDescription.
+			EDAApplications uniqueInstance register: result ]
+		ifNotEmpty: [ :c | result := c first. result description: aDescription ].
+	^ result
+]
+
 { #category : #accessing }
 EDAApplication >> applicationName [
 	^ applicationName ifNil: [ self class applicationName ]
@@ -193,6 +206,18 @@ EDAApplication >> configureEventStoreAuthentication [
 { #category : #'setup - projections' }
 EDAApplication >> configureProjectionBackendAuthentication: anObject [
 	anObject configureAuthentication
+]
+
+{ #category : #accessing }
+EDAApplication >> description [
+
+	^ description ifNil: [ self applicationName ]
+]
+
+{ #category : #accessing }
+EDAApplication >> description: aString [
+
+	description := aString
 ]
 
 { #category : #'class initialization' }
