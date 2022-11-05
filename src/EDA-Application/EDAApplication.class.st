@@ -38,12 +38,13 @@ Class {
 		'applicationName',
 		'portSettings',
 		'settingsAnnouncer',
-		'description'
+		'description',
+		'iconProvider'
 	],
 	#classVars : [
 		'ProjectionSynchronizationEnabled'
 	],
-	#category : #'EDA-Application'
+	#category : #'EDA-Application-Core'
 }
 
 { #category : #accessing }
@@ -223,6 +224,7 @@ EDAApplication >> description: aString [
 { #category : #'class initialization' }
 EDAApplication >> doInitialize [
 
+	self iconProvider: EDAIconProvider new.
 	self isStarted: false.
 	self isConfigured: false.
 	self resetPortSettings.
@@ -298,6 +300,18 @@ EDAApplication >> eventStoreSettingsPort: anAdapter [
 	anAdapter = self portSettingsPort eventStoreSettingsPort
 		ifTrue: [ ^ self ].
 	self notifyEventStoreSettingsPortListener: anAdapter
+]
+
+{ #category : #accessing }
+EDAApplication >> iconProvider [
+
+	^ iconProvider
+]
+
+{ #category : #accessing }
+EDAApplication >> iconProvider: anObject [
+
+	iconProvider := anObject
 ]
 
 { #category : #'class initialization' }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'edaApplication'
 	],
-	#category : #'EDA-Application'
+	#category : #'EDA-Application-Events'
 }
 
 { #category : #'instance creation' }

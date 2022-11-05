@@ -6,21 +6,22 @@ Class {
 
 { #category : #baselines }
 BaselineOfPharoEDA >> baseline: spec [
+
 	<baseline>
-	spec
-		for: #common
-		do: [ spec blessing: #baseline.
-			self includeBabyMock2: spec.
-			self includeNeoJSON: spec.
-			self includeGToolkit: spec.
-			self includePharoEDAApi: spec.
-			self includePharoEDAAdapters: spec.
-			self includePharoEDACommon: spec.
-			self includePharoEDAPorts: spec.
-			self includePharoEDASettings: spec.
-			self includePharoEDATools: spec.
-			self declarePackagesIn: spec.
-			self declareGroupsIn: spec ]
+	spec for: #common do: [ 
+		spec blessing: #baseline.
+		spec postLoadDoIt: #'postload:package:'.
+		self includeBabyMock2: spec.
+		self includeNeoJSON: spec.
+		self includeGToolkit: spec.
+		self includePharoEDAApi: spec.
+		self includePharoEDAAdapters: spec.
+		self includePharoEDACommon: spec.
+		self includePharoEDAPorts: spec.
+		self includePharoEDASettings: spec.
+		self includePharoEDATools: spec.
+		self declarePackagesIn: spec.
+		self declareGroupsIn: spec ]
 ]
 
 { #category : #meta }
@@ -136,4 +137,10 @@ spec
 		baseline: 'PharoEDATools'
 		with: [ spec repository: 'github://rydnr/pharo-eda-tools:main' ].
 	^ spec
+]
+
+{ #category : #baselines }
+BaselineOfPharoEDA >> postload: loader package: packageSpec [
+
+	self halt	
 ]

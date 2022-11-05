@@ -11,7 +11,7 @@ Class {
 	#classInstVars : [
 		'uniqueInstance'
 	],
-	#category : #'EDA-Application'
+	#category : #'EDA-Application-Core'
 }
 
 { #category : #logging }

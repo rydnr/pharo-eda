@@ -3,7 +3,7 @@ Class {
 	#superclass : #Object,
 	#traits : 'EDACSettingBrowserHelper',
 	#classTraits : 'EDACSettingBrowserHelper classTrait',
-	#category : #'EDA-Application'
+	#category : #'EDA-Application-Events'
 }
 
 { #category : #'event handling' }

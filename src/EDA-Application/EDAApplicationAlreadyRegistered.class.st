@@ -1,7 +1,7 @@
 Class {
 	#name : #EDAApplicationAlreadyRegistered,
 	#superclass : #Error,
-	#category : #'EDA-Application'
+	#category : #'EDA-Application-Exceptions'
 }
 
 { #category : #'instance creation' }
