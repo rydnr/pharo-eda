@@ -44,6 +44,12 @@ EDAIconProvider >> addLocation: aFileReference [
 ]
 
 { #category : #accessing }
+EDAIconProvider >> iconNamed: aName [
+
+	^ self iconNamed: aName ifAbsent: [ Smalltalk ui icons iconNamed: aName ifNone: #comments ]
+]
+
+{ #category : #accessing }
 EDAIconProvider >> iconNamed: aName ifAbsent: aBlock [
 
     | icon |

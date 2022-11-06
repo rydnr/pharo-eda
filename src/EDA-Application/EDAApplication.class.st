@@ -40,7 +40,7 @@ Class {
 		'settingsAnnouncer',
 		'description',
 		'iconProvider',
-		'icon'
+		'iconName'
 	],
 	#classVars : [
 		'ProjectionSynchronizationEnabled'
@@ -165,14 +165,23 @@ EDAApplication class >> withName: anApplicationName andDescription: aDescription
 ]
 
 { #category : #'instance creation' }
-EDAApplication class >> withName: anApplicationName description: aDescription andIcon: anIconName [
+EDAApplication class >> withName: anApplicationName description: aDescription andIconName: anIconName [
+
 	| result |
-	(EDAApplications uniqueInstance edaApplications
-		select: [ :app | app applicationName = anApplicationName ])
-		ifEmpty: [ result := self basicNew initialize.
-			result applicationName: anApplicationName; description: aDescription; icon: anIconName.
+	(EDAApplications uniqueInstance edaApplications select: [ :app | 
+		 app applicationName = anApplicationName ])
+		ifEmpty: [ 
+			result := self basicNew initialize.
+			result
+				applicationName: anApplicationName;
+				description: aDescription;
+				iconName: anIconName.
 			EDAApplications uniqueInstance register: result ]
-		ifNotEmpty: [ :c | result := c first. result description: aDescription; icon: anIconName ].
+		ifNotEmpty: [ :c | 
+			result := c first.
+			result
+				description: aDescription;
+				icon: anIconName ].
 	^ result
 ]
 
@@ -318,13 +327,19 @@ EDAApplication >> eventStoreSettingsPort: anAdapter [
 { #category : #accessing }
 EDAApplication >> icon [
 
-	^ icon
+	^ iconProvider iconNamed: self iconName
 ]
 
 { #category : #accessing }
-EDAApplication >> icon: anObject [
+EDAApplication >> iconName [
 
-	icon := anObject
+	^ iconName
+]
+
+{ #category : #accessing }
+EDAApplication >> iconName: aString [
+
+	iconName := aString
 ]
 
 { #category : #accessing }
