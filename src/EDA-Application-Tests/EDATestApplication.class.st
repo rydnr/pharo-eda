@@ -1,7 +1,7 @@
 Class {
 	#name : #EDATestApplication,
 	#superclass : #EDAApplication,
-	#category : 'EDA-Application-Tests'
+	#category : #'EDA-Application-Tests'
 }
 
 { #category : #lifecycle }
@@ -17,4 +17,14 @@ EDATestApplication class >> setupCommandConsumerUnused [
 	proxy := SynchronizedStompTopicListener wrap: EDATestApplication commandConsumer busListener.
 	EDATestApplication commandConsumer busListener: proxy.
 	^ self
+]
+
+{ #category : #accessing }
+EDATestApplication >> resetEventSubscriptions [
+	^ self shouldBeImplemented
+]
+
+{ #category : #accessing }
+EDATestApplication >> setupEventSubscriptions [
+	^ self shouldBeImplemented
 ]

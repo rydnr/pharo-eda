@@ -6,17 +6,23 @@ Class {
 		'locations'
 	],
 	#classVars : [
+		'DefaultLocations',
 		'IconsFolder'
 	],
 	#category : #'EDA-Application-Icons'
 }
 
 { #category : #defaults }
+EDAIconProvider class >> addDefaultLocation: aFolder [
+
+	DefaultLocations add: aFolder
+]
+
+{ #category : #defaults }
 EDAIconProvider class >> defaultLocations [
 
-	^ OrderedCollection
-		  with: FileSystem workingDirectory / 'resources' / 'icons'
-		  with: self iconsFolder
+	^ DefaultLocations ifNil: [ DefaultLocations := OrderedCollection with: FileSystem workingDirectory / 'resources' / 'icons'
+		  with: self iconsFolder ]
 ]
 
 { #category : #defaults }
