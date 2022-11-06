@@ -39,7 +39,8 @@ Class {
 		'portSettings',
 		'settingsAnnouncer',
 		'description',
-		'iconProvider'
+		'iconProvider',
+		'icon'
 	],
 	#classVars : [
 		'ProjectionSynchronizationEnabled'
@@ -160,6 +161,18 @@ EDAApplication class >> withName: anApplicationName andDescription: aDescription
 			result applicationName: anApplicationName; description: aDescription.
 			EDAApplications uniqueInstance register: result ]
 		ifNotEmpty: [ :c | result := c first. result description: aDescription ].
+	^ result
+]
+
+{ #category : #'instance creation' }
+EDAApplication class >> withName: anApplicationName description: aDescription andIcon: anIconName [
+	| result |
+	(EDAApplications uniqueInstance edaApplications
+		select: [ :app | app applicationName = anApplicationName ])
+		ifEmpty: [ result := self basicNew initialize.
+			result applicationName: anApplicationName; description: aDescription; icon: anIconName.
+			EDAApplications uniqueInstance register: result ]
+		ifNotEmpty: [ :c | result := c first. result description: aDescription; icon: anIconName ].
 	^ result
 ]
 
@@ -300,6 +313,18 @@ EDAApplication >> eventStoreSettingsPort: anAdapter [
 	anAdapter = self portSettingsPort eventStoreSettingsPort
 		ifTrue: [ ^ self ].
 	self notifyEventStoreSettingsPortListener: anAdapter
+]
+
+{ #category : #accessing }
+EDAApplication >> icon [
+
+	^ icon
+]
+
+{ #category : #accessing }
+EDAApplication >> icon: anObject [
+
+	icon := anObject
 ]
 
 { #category : #accessing }
