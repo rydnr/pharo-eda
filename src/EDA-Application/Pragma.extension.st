@@ -9,5 +9,7 @@ Pragma class >> allNamed: aSymbol inAndBelow: aClass [
 		  aClass withAllSubclassesDo: [ :class | 
 			  class pragmasDo: [ :pragma | 
 				  pragma selector = aSymbol ifTrue: [ stream nextPut: pragma ] ].
+			  class class pragmasDo: [ :pragma | 
+				  pragma selector = aSymbol ifTrue: [ stream nextPut: pragma ] ].
 			  aClass = class ifTrue: [ ^ stream contents ] ] ]
 ]
