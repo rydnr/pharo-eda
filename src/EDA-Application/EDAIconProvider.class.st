@@ -15,7 +15,7 @@ Class {
 { #category : #defaults }
 EDAIconProvider class >> addDefaultLocation: aFolder [
 
-	DefaultLocations add: aFolder
+	self defaultLocations add: aFolder
 ]
 
 { #category : #defaults }
