@@ -1,3 +1,16 @@
+"
+**Class**
+
+I'm a baseline to load PharoEDA.
+
+**Responsibilities**
+
+Guide Metacello to load PharoEDA with its dependencies.
+
+**Collaborators**
+
+Metacello
+"
 Class {
 	#name : #BaselineOfPharoEDA,
 	#superclass : #BaselineOf,
@@ -142,7 +155,10 @@ spec
 { #category : #baselines }
 BaselineOfPharoEDA >> postload: loader package: packageSpec [
 
-	EDAIconProvider iconsFolder:
-		(IceRepository registry detect: [ :each | each name = 'pharo-eda' ])
-			location / 'resources' / 'icons'
+	| location |
+	location := (IceRepository registry detect: [ :each | 
+		             each name = 'pharo-eda' ]) location.
+	EDAIconProvider addDefaultLocation: location / 'resources' / 'icons'.
+	EDACTranslationProvider addDefaultLocation:
+		location / 'resources' / 'l10n'
 ]
