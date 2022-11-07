@@ -246,7 +246,7 @@ EDAApplication >> description: aString [
 { #category : #'class initialization' }
 EDAApplication >> doInitialize [
 
-	self iconProvider: EDAIconProvider new.
+	self iconProvider: EDACIconProvider new.
 	self isStarted: false.
 	self isConfigured: false.
 	self resetPortSettings.
