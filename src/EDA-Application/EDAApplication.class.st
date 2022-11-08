@@ -181,7 +181,7 @@ EDAApplication class >> withName: anApplicationName description: aDescription an
 			result := c first.
 			result
 				description: aDescription;
-				icon: anIconName ].
+				iconName: anIconName ].
 	^ result
 ]
 
