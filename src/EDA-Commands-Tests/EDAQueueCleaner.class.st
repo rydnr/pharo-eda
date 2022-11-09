@@ -8,7 +8,7 @@ Class {
 		'password',
 		'queues'
 	],
-	#category : 'EDA-Commands-Tests'
+	#category : #'EDA-Commands-Tests'
 }
 
 { #category : #defaults }
@@ -77,13 +77,15 @@ EDAQueueCleaner >> deleteQueue: aQueue [
 
 { #category : #api }
 EDAQueueCleaner >> deleteQueue: aQueue inVirtualHost: vHost [
+
 	| client response |
 	(client := ZnClient new)
 		http;
 		host: self class host;
 		port: self class port;
-		username: self class username password: self class password;
-		url: '/api/queues/' , vHost urlEncoded , '/' , aQueue urlEncoded , '/contents';
+		username: self class user password: self class password;
+		url: '/api/queues/' , vHost urlEncoded , '/' , aQueue urlEncoded
+			, '/contents';
 		delete.
 	response := client response code.
 	^ response = 204
@@ -96,25 +98,25 @@ EDAQueueCleaner >> listQueues [
 
 { #category : #api }
 EDAQueueCleaner >> listQueuesInVirtualHost: vHost [
+
 	| result client response |
 	result := OrderedCollection new.
 	(client := ZnClient new)
 		http;
 		host: self class host;
 		port: self class port;
-		username: self class username password: self class password;
+		username: self class user password: self class password;
 		addPath: 'api';
 		addPath: 'queues'.
 	vHost ifNotNil: [ :v | client addPath: vHost ].
 	client get.
-	(client response code = 200) ifTrue: [
-	response := NeoJSONReader fromString: client contents.
-	response
-		inject: result
-		into: [ :aux :next | 
-			aux addAll: ((next keys select: [ :k | k = 'name' ]) collect: [ :k | next at: k ]) asOrderedCollection flattened.
+	client response code = 200 ifTrue: [ 
+		response := NeoJSONReader fromString: client contents.
+		response inject: result into: [ :aux :next | 
+			aux addAll:
+				((next keys select: [ :k | k = 'name' ]) collect: [ :k | 
+					 next at: k ]) asOrderedCollection flattened.
 			aux ].
-	result := result flattened.
-	].
+		result := result flattened ].
 	^ result
 ]
