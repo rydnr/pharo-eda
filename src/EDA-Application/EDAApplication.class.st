@@ -444,7 +444,7 @@ EDAApplication >> portSettings: anAdapter [
 
 { #category : #accessing }
 EDAApplication >> projectionSettingsPort [
-	^ self resolveProjectionSettingsPort
+	^ self resolveProjectionsSettingsPort
 ]
 
 { #category : #accessing }
