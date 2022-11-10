@@ -264,11 +264,21 @@ EDAApplication >> doSetup [
 	self setupRepositories.
 	self setupProjections.
 	self setupProjectors.
-	self projectionSynchronizationEnabled
+	self enableSynchronization
 		ifTrue: [ self synchronizeProjections ].
 	self setupCommandDispatcher.
 	self setupCommandConsumer.
 	self setupEventSubscriptions
+]
+
+{ #category : #accessing }
+EDAApplication >> enableSynchronization [
+	^ ProjectionSynchronizationEnabled
+]
+
+{ #category : #accessing }
+EDAApplication >> enableSynchronization: aBoolean [
+	ProjectionSynchronizationEnabled := aBoolean
 ]
 
 { #category : #accessing }
@@ -398,7 +408,7 @@ EDAApplication >> logSettings [
 	self
 		logDebugMessage:
 			'Projection synchronization enabled: '
-				, self projectionSynchronizationEnabled greaseString.
+				, self enableSynchronization greaseString.
 	self
 		logDebugMessage: 'Projectors: ' , self projectorsByTenant greaseString
 ]
@@ -435,16 +445,6 @@ EDAApplication >> portSettings: anAdapter [
 { #category : #accessing }
 EDAApplication >> projectionSettingsPort [
 	^ self resolveProjectionSettingsPort
-]
-
-{ #category : #accessing }
-EDAApplication >> projectionSynchronizationEnabled [
-	^ ProjectionSynchronizationEnabled
-]
-
-{ #category : #accessing }
-EDAApplication >> projectionSynchronizationEnabled: aBoolean [
-	ProjectionSynchronizationEnabled := aBoolean
 ]
 
 { #category : #accessing }
