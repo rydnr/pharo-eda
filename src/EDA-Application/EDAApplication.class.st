@@ -195,6 +195,12 @@ EDAApplication >> applicationName: aString [
 	applicationName := aString
 ]
 
+{ #category : #subclassresponsibility }
+EDAApplication >> commandClassPrefix [
+
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 EDAApplication >> commandConsumer [
 	^ commandConsumer
@@ -295,6 +301,12 @@ EDAApplication >> eventAnnouncer [
 { #category : #accessing }
 EDAApplication >> eventAnnouncer: anObject [
 	eventAnnouncer := anObject
+]
+
+{ #category : #subclassresponsibility }
+EDAApplication >> eventClassPrefix [
+
+	self subclassResponsibility 
 ]
 
 { #category : #accessing }
@@ -599,7 +611,7 @@ EDAApplication >> setupCommandConsumerWithCommandListener: listener [
 	listener client debug: self commandListenerClientDebug.
 	materializer := EDAJsonCommandMaterializer new.
 	self
-		commandConsumer: (EDACommandConsumer busListener: listener commandMaterializer: materializer commandDispatcher: self commandDispatcher)
+		commandConsumer: (EDAPCommandConsumer busListener: listener commandMaterializer: materializer commandDispatcher: self commandDispatcher)
 ]
 
 { #category : #setup }
@@ -622,7 +634,7 @@ EDAApplication >> setupEventProducer [
 	| eventPublisher eventSerializer |
 	eventPublisher := EDAAEventStompTopicPublisher new.
 	eventSerializer := EDAJsonEventSerializer new.
-	self eventProducer: (EDAEventProducer publisher: eventPublisher serializer: eventSerializer announcer: self eventAnnouncer)
+	self eventProducer: (EDAPEventProducer publisher: eventPublisher serializer: eventSerializer announcer: self eventAnnouncer)
 ]
 
 { #category : #'setup - events' }
