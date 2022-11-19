@@ -58,7 +58,11 @@ EDACommandMaterializer class >> logWarningMessage: aMessage beautify: aBoolean [
 
 { #category : #parsing }
 EDACommandMaterializer >> commandClassForName: aCommandName [
-	^ self commandClassPrefix , (aCommandName copyWithRegex: '_' matchesReplacedWith: ' ') asLowercase asCamelCase
+
+	^ self edaApplication commandClassPrefix
+	  ,
+		  (aCommandName copyWithRegex: '_' matchesReplacedWith: ' ')
+			  asLowercase asCamelCase
 ]
 
 { #category : #parsing }

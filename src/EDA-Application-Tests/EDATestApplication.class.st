@@ -20,6 +20,11 @@ EDATestApplication class >> setupCommandConsumerUnused [
 ]
 
 { #category : #accessing }
+EDATestApplication >> eventClassPrefix [
+	^ self shouldBeImplemented
+]
+
+{ #category : #accessing }
 EDATestApplication >> resetEventSubscriptions [
 	^ self shouldBeImplemented
 ]

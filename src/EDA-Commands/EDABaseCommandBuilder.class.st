@@ -25,7 +25,7 @@ This class is not used directly.
 Class {
 	#name : #EDABaseCommandBuilder,
 	#superclass : #Object,
-	#category : 'EDA-Commands-Builders'
+	#category : #'EDA-Commands-Builders'
 }
 
 { #category : #protected }
@@ -48,10 +48,13 @@ EDABaseCommandBuilder >> buildWith: commandParams [
 
 { #category : #protected }
 EDABaseCommandBuilder >> commandClassForName: aCommandName [
-    "Retrieves the command class for given name"
-    ^ self commandClassPrefix ,
-	    (aCommandName copyWithRegex: '_' matchesReplacedWith: ' ')
-	        asLowercase asCamelCase
+
+	"Retrieves the command class for given name"
+
+	^ self edaApplication commandClassPrefix
+	  ,
+		  (aCommandName copyWithRegex: '_' matchesReplacedWith: ' ')
+			  asLowercase asCamelCase
 ]
 
 { #category : #public }
