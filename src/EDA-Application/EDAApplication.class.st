@@ -43,6 +43,7 @@ Class {
 		'iconName'
 	],
 	#classVars : [
+		'CommandBuilder',
 		'ProjectionSynchronizationEnabled'
 	],
 	#category : #'EDA-Application-Core'
@@ -193,6 +194,18 @@ EDAApplication >> applicationName [
 { #category : #accessing }
 EDAApplication >> applicationName: aString [
 	applicationName := aString
+]
+
+{ #category : #accessing }
+EDAApplication >> commandBuilder [
+
+	^ CommandBuilder
+]
+
+{ #category : #accessing }
+EDAApplication >> commandBuilder: aBuilder [
+
+	CommandBuilder := aBuilder
 ]
 
 { #category : #subclassresponsibility }

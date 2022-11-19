@@ -19,6 +19,11 @@ EDATestApplication class >> setupCommandConsumerUnused [
 	^ self
 ]
 
+{ #category : #subclassresponsibility }
+EDATestApplication >> commandClassPrefix [
+	^ self shouldBeImplemented
+]
+
 { #category : #accessing }
 EDATestApplication >> eventClassPrefix [
 	^ self shouldBeImplemented
