@@ -250,7 +250,7 @@ EDATDomainBDD >> givenAggregate: anAggregateRootSymbol withEvents: historicalEve
 		fixAggregateRootVersionsOfEvents: historicalEvents
 		usingEventStore: eventStore.
 	eventStore saveEvents: eventsToSave.
-	commandConsumer := EDACommandConsumer
+	commandConsumer := EDAPCommandConsumer
 		busListener: mock
 		commandMaterializer: EDAJsonCommandMaterializer new
 		commandDispatcher:
@@ -272,7 +272,7 @@ EDATDomainBDD >> givenAggregate: anAggregateRootSymbol withEvents: historicalEve
 		to: aString.
 	resultingEvents := commandConsumer
 		consumeMessage: aString
-		usingStrategy: EDAThrowError greaseString.
+		usingStrategy: EDAEThrowError greaseString.
 	self assert: resultingEvents isNotNil.
 	self assert: resultingEvents size equals: expectedEvents size.
 	resultingEvents
