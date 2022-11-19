@@ -238,6 +238,13 @@ EDAApplication >> configureProjectionBackendAuthentication: anObject [
 ]
 
 { #category : #accessing }
+EDAApplication >> contractsFolder [
+
+	^ FileSystem workingDirectory
+	          / self applicationName / 'contracts'
+]
+
+{ #category : #accessing }
 EDAApplication >> description [
 
 	^ description ifNil: [ self applicationName ]
