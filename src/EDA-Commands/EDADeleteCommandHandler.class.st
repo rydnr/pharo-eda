@@ -31,3 +31,8 @@ EDADeleteCommandHandler >> delegateHandlingOfCommand: aCommand toAggregate: anAg
 					
 
 ]
+
+{ #category : #handling }
+EDADeleteCommandHandler >> invokeMethodHandlerWith: arg1 on: arg2 [ 
+	^ self shouldBeImplemented
+]
