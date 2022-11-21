@@ -25,10 +25,6 @@ BaselineOfPharoEDA >> baseline: spec [
 		spec blessing: #baseline.
 		spec postLoadDoIt: #postload:package:.
 		self
-			includeBabyMock2: spec;
-			includeObjectDiff: spec;
-			includeNeoJSON: spec;
-			includeGToolkit: spec;
 			includePharoEDACore: spec;
 			includePharoEDAApi: spec;
 			includePharoEDAAdapters: spec;
