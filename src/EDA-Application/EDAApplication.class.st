@@ -240,6 +240,12 @@ EDAApplication >> commandListenerSettings [
 	^ self portSettings commandListenerSettings
 ]
 
+{ #category : #files }
+EDAApplication >> configFolder [
+
+	^ self rootFolder / 'config'
+]
+
 { #category : #'setup - events' }
 EDAApplication >> configureEventStoreAuthentication [
 		EDAAMongoEventStore authenticationMechanism beDefault
@@ -250,11 +256,10 @@ EDAApplication >> configureProjectionBackendAuthentication: anObject [
 	anObject configureAuthentication
 ]
 
-{ #category : #accessing }
+{ #category : #files }
 EDAApplication >> contractsFolder [
 
-	^ FileSystem workingDirectory
-	          / self applicationName / 'contracts'
+	^ self rootFolder / 'contracts'
 ]
 
 { #category : #accessing }
@@ -592,16 +597,25 @@ EDAApplication >> resetSettingsAnnouncer [
 
 { #category : #accessing }
 EDAApplication >> resolveSettingsPort: aPort [
+
 	| candidates candidate |
-	candidates := (aPort traitUsers select: [ :cls | cls accepts: self ])
-		sorted.
-	candidate := candidates ifEmpty: [ nil ] ifNotEmpty: [ :col | col first ].
+	candidates := (aPort traitUsers select: [ :cls | cls accepts: aPort inApp: self ])
+		              sorted.
+	candidate := candidates
+		             ifEmpty: [ nil ]
+		             ifNotEmpty: [ :col | col first ].
 	^ candidate ifNil: [ nil ] ifNotNil: [ :c | c withApp: self ]
 ]
 
 { #category : #'multitenancy support' }
 EDAApplication >> retrieveAllTenants [
 	self shouldBeImplemented
+]
+
+{ #category : #files }
+EDAApplication >> rootFolder [
+
+	^ FileSystem workingDirectory / self applicationName
 ]
 
 { #category : #accessing }
@@ -672,7 +686,7 @@ EDAApplication >> setupEventProducer [
 { #category : #'setup - events' }
 EDAApplication >> setupEventStore [
 	self flag: #TODO.	"Find out how to customize the authentication of the specific Mongo instance"
-	self eventStore: EDAAMongoEventStore new.
+	self portSettings eventStore: (self portSettings eventStoreSettings buildAdapter)
 	self configureEventStoreAuthentication
 ]
 
