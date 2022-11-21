@@ -27,6 +27,7 @@ Class {
 	#traits : 'EDACLogging',
 	#classTraits : 'EDACLogging classTrait',
 	#instVars : [
+		'commandBuilder',
 		'commandConsumer',
 		'commandDispatcher',
 		'eventAnnouncer',
@@ -40,11 +41,8 @@ Class {
 		'settingsAnnouncer',
 		'description',
 		'iconProvider',
-		'iconName'
-	],
-	#classVars : [
-		'CommandBuilder',
-		'ProjectionSynchronizationEnabled'
+		'iconName',
+		'projectionSynchronizationEnabled'
 	],
 	#category : #'EDA-Application-Core'
 }
@@ -199,19 +197,21 @@ EDAApplication >> applicationName: aString [
 { #category : #accessing }
 EDAApplication >> commandBuilder [
 
-	^ CommandBuilder
+	^ commandBuilder ifNil: [ 
+		  self commandBuilder: (EDADefaultCommandBuilder forApplication: self).
+		  commandBuilder ]
 ]
 
 { #category : #accessing }
 EDAApplication >> commandBuilder: aBuilder [
 
-	CommandBuilder := aBuilder
+	commandBuilder := aBuilder
 ]
 
 { #category : #subclassresponsibility }
 EDAApplication >> commandClassPrefix [
 
-	self subclassResponsibility
+	^ ''
 ]
 
 { #category : #accessing }
@@ -282,6 +282,7 @@ EDAApplication >> doInitialize [
 
 { #category : #setup }
 EDAApplication >> doSetup [
+
 	SettingBrowser open delete.
 	self setupLogging.
 	self setupEventAnnouncer.
@@ -290,21 +291,23 @@ EDAApplication >> doSetup [
 	self setupRepositories.
 	self setupProjections.
 	self setupProjectors.
-	self enableSynchronization
-		ifTrue: [ self synchronizeProjections ].
+	self enableSynchronization ifTrue: [ self synchronizeProjections ].
 	self setupCommandDispatcher.
 	self setupCommandConsumer.
-	self setupEventSubscriptions
+	self setupEventSubscriptions.
+	self setupCommandBuilder
 ]
 
 { #category : #accessing }
 EDAApplication >> enableSynchronization [
-	^ ProjectionSynchronizationEnabled
+
+	^ projectionSynchronizationEnabled
 ]
 
 { #category : #accessing }
 EDAApplication >> enableSynchronization: aBoolean [
-	ProjectionSynchronizationEnabled := aBoolean
+
+	projectionSynchronizationEnabled := aBoolean
 ]
 
 { #category : #accessing }
@@ -326,7 +329,7 @@ EDAApplication >> eventAnnouncer: anObject [
 { #category : #subclassresponsibility }
 EDAApplication >> eventClassPrefix [
 
-	self subclassResponsibility 
+	^ ''
 ]
 
 { #category : #accessing }
@@ -621,17 +624,26 @@ EDAApplication >> setup [
 ]
 
 { #category : #'setup - commands' }
+EDAApplication >> setupCommandBuilder [
+
+	^ self commandBuilder: (EDADefaultCommandBuilder forApplication: self)
+]
+
+{ #category : #'setup - commands' }
 EDAApplication >> setupCommandConsumer [
 	^ self setupCommandConsumerWithCommandListener: EDAACommandStompTopicListener new
 ]
 
 { #category : #'setup - commands' }
 EDAApplication >> setupCommandConsumerWithCommandListener: listener [
+
 	| materializer |
 	listener client debug: self commandListenerClientDebug.
-	materializer := EDAJsonCommandMaterializer new.
-	self
-		commandConsumer: (EDAPCommandConsumer busListener: listener commandMaterializer: materializer commandDispatcher: self commandDispatcher)
+	materializer := EDAJsonCommandMaterializer forApplication: self.
+	self commandConsumer: (EDAPCommandConsumer
+			 busListener: listener
+			 commandMaterializer: materializer
+			 commandDispatcher: self commandDispatcher)
 ]
 
 { #category : #setup }

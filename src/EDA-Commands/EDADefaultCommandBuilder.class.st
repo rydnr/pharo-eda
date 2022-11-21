@@ -61,15 +61,18 @@ EDADefaultCommandBuilder class >> logWarningMessage: aMessage beautify: aBoolean
 
 { #category : #building }
 EDADefaultCommandBuilder >> buildCommandFromCommandName: commandName [
+
 	| result |
-	result := commandDictionary at: commandName ifAbsent: [ nil ].
-	result
-		ifNil: [ self
-				logErrorMessage: (String streamContents: [ :s | s nextPutAll:
-					self class greaseString; nextPutAll: ' does not currently know how to build '
-						; nextPutAll: commandName greaseString ; nextPutAll: ' commands. Check '
-						; nextPutAll: self class greaseString ; nextPutAll: '>>initializeCommandMappings' ])
-				andThrow: EDACommandError ].
+	result := self commandClassForName: commandName.
+	(self classExists: result) ifFalse: [ 
+		self
+			logErrorMessage: (String streamContents: [ :s | 
+					 s
+						 nextPutAll: self class greaseString;
+						 nextPutAll: ' does not currently know how to build ';
+						 nextPutAll: commandName greaseString;
+						 nextPutAll: ' commands.' ])
+			andThrow: EDACommandError ].
 	^ result new
 ]
 
@@ -112,16 +115,6 @@ EDADefaultCommandBuilder >> buildWith: jsonDict [
 						andThrow: EDAInvalidCommandMessage ] ]
 ]
 
-{ #category : #accessing }
-EDADefaultCommandBuilder >> commandDictionary [
-	^ commandDictionary
-]
-
-{ #category : #accessing }
-EDADefaultCommandBuilder >> commandDictionary: anObject [
-	commandDictionary := anObject
-]
-
 { #category : #building }
 EDADefaultCommandBuilder >> copyFromDict: aDictionary intoCommand: aCommand [
 	aDictionary
@@ -146,45 +139,25 @@ EDADefaultCommandBuilder >> copyFromDict: aDictionary intoCommand: aCommand [
 ]
 
 { #category : #initialization }
-EDADefaultCommandBuilder >> initialize [
-	commandDictionary := Dictionary new.
-	self initializeCommandMappings.
-	self initializeSpecificCommandMappings
-]
-
-{ #category : #initialization }
-EDADefaultCommandBuilder >> initializeCommandBuilders [
-	self subclassResponsibility
-
-]
-
-{ #category : #initialization }
-EDADefaultCommandBuilder >> initializeCommandMappings [
-	self subclassResponsibility
-]
-
-{ #category : #initialization }
-EDADefaultCommandBuilder >> initializeSpecificCommandMappings [
-	self subclassResponsibility
-]
-
-{ #category : #initialization }
 EDADefaultCommandBuilder >> retrieveAggregateRootClass: commandParams [
 	^ (self retrieveCommandClassFromJsonDict: commandParams) new aggregateRootClass
 ]
 
 { #category : #building }
 EDADefaultCommandBuilder >> retrieveCommandClassFromCommandName: commandName [
+
 	| result |
-	result := commandDictionary at: commandName ifAbsent: [ nil ].
-	result
-		ifNil: [ self
-				logErrorMessage: (String streamContents: [ :s | s nextPutAll:
-					self class greaseString ; nextPutAll: ' does not currently know how to build '
-						; nextPutAll: commandName greaseString ; nextPutAll: ' commands. Check '
-						; nextPutAll: self class greaseString ; nextPutAll: '>>initializeCommandMappings' ])
-				andThrow: EDACommandError ].
-	^ result
+	result := self commandClassForName: commandName.
+	(self classExists: result) ifFalse: [ 
+		self
+			logErrorMessage: (String streamContents: [ :s | 
+					 s
+						 nextPutAll: self class greaseString;
+						 nextPutAll: ' does not currently know how to build ';
+						 nextPutAll: commandName greaseString;
+						 nextPutAll: ' commands' ])
+			andThrow: EDACommandError ].
+	^ self classOrTraitNamed: result
 ]
 
 { #category : #building }

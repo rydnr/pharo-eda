@@ -4,37 +4,22 @@ Class {
 	#category : #'EDA-Application-Tests'
 }
 
-{ #category : #lifecycle }
-EDATestApplication class >> initialize [
-	"Override me if you need a custom EDAApplication"
-	"self application: EDATestApplication"
-]
-
-{ #category : #lifecycle }
-EDATestApplication class >> setupCommandConsumerUnused [
-	| proxy |
-	super setupCommandConsumer.
-	proxy := SynchronizedStompTopicListener wrap: EDATestApplication commandConsumer busListener.
-	EDATestApplication commandConsumer busListener: proxy.
-	^ self
-]
-
 { #category : #subclassresponsibility }
 EDATestApplication >> commandClassPrefix [
 	^ self shouldBeImplemented
 ]
 
-{ #category : #accessing }
+{ #category : #subclassresponsibility }
 EDATestApplication >> eventClassPrefix [
 	^ self shouldBeImplemented
 ]
 
-{ #category : #accessing }
+{ #category : #'reset - events' }
 EDATestApplication >> resetEventSubscriptions [
 	^ self shouldBeImplemented
 ]
 
-{ #category : #accessing }
+{ #category : #'setup - events' }
 EDATestApplication >> setupEventSubscriptions [
 	^ self shouldBeImplemented
 ]

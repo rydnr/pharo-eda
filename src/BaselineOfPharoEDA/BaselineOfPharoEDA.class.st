@@ -23,18 +23,19 @@ BaselineOfPharoEDA >> baseline: spec [
 	<baseline>
 	spec for: #common do: [ 
 		spec blessing: #baseline.
-		spec postLoadDoIt: #'postload:package:'.
-		self includeBabyMock2: spec.
-		self includeNeoJSON: spec.
-		self includeGToolkit: spec.
-		self includePharoEDAApi: spec.
-		self includePharoEDAAdapters: spec.
-		self includePharoEDACommon: spec.
-		self includePharoEDAPorts: spec.
-		self includePharoEDASettings: spec.
-		self includePharoEDATools: spec.
-		self declarePackagesIn: spec.
-		self declareGroupsIn: spec ]
+		spec postLoadDoIt: #postload:package:.
+		self includeBabyMock2: spec;
+		 includeObjectDiff: spec;
+		 includeNeoJSON: spec;
+		 includeGToolkit: spec;
+		 includePharoEDAApi: spec;
+		 includePharoEDAAdapters: spec;
+		 includePharoEDACommon: spec;
+		 includePharoEDAPorts: spec;
+		 includePharoEDASettings: spec;
+		 includePharoEDATools: spec;
+		 declarePackagesIn: spec;
+		 declareGroupsIn: spec ]
 ]
 
 { #category : #meta }
@@ -52,29 +53,35 @@ BaselineOfPharoEDA >> declareGroupsIn: spec [
 
 { #category : #meta }
 BaselineOfPharoEDA >> declarePackagesIn: spec [
+
 	spec
 		package: #'EDA-Events'
-			with: [ spec requires: #('PharoEDACommon' 'PharoEDAApi' 'PharoEDAPorts') ];
+		with: [ 
+			spec requires: #( 'PharoEDACommon' 'PharoEDAApi' 'PharoEDAPorts' ) ];
 		package: #'EDA-Commands'
-			with: [ spec requires: #('PharoEDACommon' 'PharoEDAApi') ];
+		with: [ spec requires: #( 'PharoEDACommon' 'PharoEDAApi' ) ];
 		package: #'EDA-Projections-Tests'
-			with: [ spec requires: #('PharoEDACommon') ];
+		with: [ spec requires: #( 'PharoEDACommon' ) ];
 		package: #'EDA-TestSupport'
-			with: [ spec requires: #('PharoEDAPorts' 'NeoJSON') ];
-		package: #'EDA-Application'
-			with: [ spec
-				requires:
-					#('EDA-Events' 'EDA-Commands' 'PharoEDACommon' 'PharoEDASettings' 'PharoEDAAdapters') ];
+		with: [ spec requires: #( 'PharoEDAPorts' 'NeoJSON' 'ObjectDiff') ];
+		package: #'EDA-Application' with: [ 
+			spec requires:
+					#( 'EDA-Events' 'EDA-Commands' 'PharoEDACommon' 'PharoEDASettings'
+					   'PharoEDAAdapters' ) ];
 		package: #'EDA-Commands-Tests'
-			with: [ spec requires: #('BabyMock2' 'PharoEDACommon' 'EDA-TestSupport') ];
+		with: [ 
+			spec requires: #( 'BabyMock2' 'PharoEDACommon' 'EDA-TestSupport' ) ];
 		package: #'EDA-Commands-Tests-Tests'
-			with: [ spec requires: #('EDA-Commands-Tests') ];
+		with: [ spec requires: #( 'EDA-Commands-Tests' ) ];
 		package: #'EDA-Application-Tests'
-			with: [ spec requires: #('BabyMock2' 'PharoEDACommon' 'EDA-TestSupport') ];
+		with: [ 
+			spec requires: #( 'BabyMock2' 'PharoEDACommon' 'EDA-TestSupport' ) ];
 		package: #'EDA-Domain-Tests'
-			with: [ spec requires: #('BabyMock2' 'PharoEDACommon' 'EDA-TestSupport') ];
+		with: [ 
+			spec requires: #( 'BabyMock2' 'PharoEDACommon' 'EDA-TestSupport' ) ];
 		package: #'EDA-Domain-GT-Extensions'
-			with: [ spec requires: #('BabyMock2' 'PharoEDACommon' 'GToolkit') ]
+		with: [ spec requires: #( 'BabyMock2' 'PharoEDACommon'
+				   'GToolkit' ) ]
 ]
 
 { #category : #dependencies }
@@ -101,6 +108,15 @@ BaselineOfPharoEDA >> includeNeoJSON: spec [
 	spec
 		baseline: 'NeoJSON'
 		with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
+	^ spec
+]
+
+{ #category : #dependencies }
+BaselineOfPharoEDA >> includeObjectDiff: spec [
+
+	spec
+		baseline: 'ObjectDiff'
+		with: [ spec repository: 'github://rydnr/object-diff:main/src' ].
 	^ spec
 ]
 

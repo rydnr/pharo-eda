@@ -25,8 +25,19 @@ This class is not used directly.
 Class {
 	#name : #EDABaseCommandBuilder,
 	#superclass : #Object,
+	#traits : 'EDACReflectionHelper',
+	#classTraits : 'EDACReflectionHelper classTrait',
+	#instVars : [
+		'edaApplication'
+	],
 	#category : #'EDA-Commands-Builders'
 }
+
+{ #category : #'instance creation' }
+EDABaseCommandBuilder class >> forApplication: anEDAApplication [
+
+	^ self new edaApplication: anEDAApplication; yourself
+]
 
 { #category : #protected }
 EDABaseCommandBuilder >> buildWith: commandParams [
@@ -59,8 +70,22 @@ EDABaseCommandBuilder >> commandClassForName: aCommandName [
 
 { #category : #public }
 EDABaseCommandBuilder >> commandClassPrefix [
-   "Returns the class prefix for application's commands"
-	self subclassResponsibility 
+
+	"Returns the class prefix for application's commands"
+
+	self edaApplication commandClassPrefix
+]
+
+{ #category : #accessing }
+EDABaseCommandBuilder >> edaApplication [
+
+	^ edaApplication
+]
+
+{ #category : #accessing }
+EDABaseCommandBuilder >> edaApplication: anObject [
+
+	edaApplication := anObject
 ]
 
 { #category : #protected }

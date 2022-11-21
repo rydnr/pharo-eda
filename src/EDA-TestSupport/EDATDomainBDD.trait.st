@@ -1,5 +1,8 @@
 Trait {
 	#name : #EDATDomainBDD,
+	#instVars : [
+		'edaApplication'
+	],
 	#traits : 'EDACLogging + EDACRegexHelper',
 	#classTraits : 'EDACLogging classTrait + EDACRegexHelper classTrait',
 	#category : #'EDA-TestSupport'
@@ -161,6 +164,18 @@ EDATDomainBDD >> discardDateCreated: anEvent [
 				ifTrue: [ anEvent dateCreated: '<ANYTHING>' ].
 ]
 
+{ #category : #accessing }
+EDATDomainBDD >> edaApplication [
+
+	^ edaApplication
+]
+
+{ #category : #accessing }
+EDATDomainBDD >> edaApplication: anEDAApplication [
+
+	edaApplication := anEDAApplication 
+]
+
 { #category : #helper }
 EDATDomainBDD >> fixAggregateRootVersionsOfEvents: anEventCollection usingEventStore: anEventStore [
 	^ EDACommandHandler addVersionToEvents: anEventCollection usingEventStore: anEventStore
@@ -241,51 +256,56 @@ EDATDomainBDD >> givenAggregate: anAggregateRootSymbol withEvents: historicalEve
 
 { #category : #BDD }
 EDATDomainBDD >> givenAggregate: anAggregateRootSymbol withEvents: historicalEvents whenReceiveMessage: aString thenEvents: expectedResultingEvents [
+
 	| commandConsumer resultingEvents mock eventStore expectedEvents eventsToSave aggregateRootVersion msg eventsOfAggregate originalEventStores |
 	mock := EDAAcceptEverything new.
 	eventStore := EDAVolatileEventStore new.
 	originalEventStores := self retrieveEventStores.
-	[ self useEventStore: eventStore.
+	[ 
+	self useEventStore: eventStore.
 	eventsToSave := self
-		fixAggregateRootVersionsOfEvents: historicalEvents
-		usingEventStore: eventStore.
+		                fixAggregateRootVersionsOfEvents: historicalEvents
+		                usingEventStore: eventStore.
 	eventStore saveEvents: eventsToSave.
 	commandConsumer := EDAPCommandConsumer
-		busListener: mock
-		commandMaterializer: EDAJsonCommandMaterializer new
-		commandDispatcher:
-			(EDAApplication
-				buildCommandDispatcherWithEventStore: eventStore
-				eventProducer: mock
-				andProjectorClass: mock).
-	eventsOfAggregate := eventsToSave
-		select:
-			[ :e | e aggregateRootClass greaseString asSymbol = anAggregateRootSymbol ].
+		                   busListener: mock
+		                   commandMaterializer:
+		                   (EDAJsonCommandMaterializer forApplication:
+			                    edaApplication)
+		                   commandDispatcher: (EDAApplication
+				                    buildCommandDispatcherWithEventStore:
+				                    eventStore
+				                    eventProducer: mock
+				                    andProjectorClass: mock).
+	eventsOfAggregate := eventsToSave select: [ :e | 
+		                     e aggregateRootClass greaseString asSymbol
+		                     = anAggregateRootSymbol ].
 	aggregateRootVersion := eventsOfAggregate
-		ifEmpty: [ 0 ]
-		ifNotEmpty: [ eventsOfAggregate last aggregateRootVersion ].
+		                        ifEmpty: [ 0 ]
+		                        ifNotEmpty: [ 
+		                        eventsOfAggregate last aggregateRootVersion ].
 	expectedEvents := self
-		fixAggregateRootVersionsOfEvents: expectedResultingEvents
-		usingEventStore: eventStore.
+		                  fixAggregateRootVersionsOfEvents:
+		                  expectedResultingEvents
+		                  usingEventStore: eventStore.
 	msg := self
-		provideAggregateRootVersion: aggregateRootVersion
-		to: aString.
+		       provideAggregateRootVersion: aggregateRootVersion
+		       to: aString.
 	resultingEvents := commandConsumer
-		consumeMessage: aString
-		usingStrategy: EDAEThrowError greaseString.
+		                   consumeMessage: aString
+		                   usingStrategy: EDAEThrowError greaseString.
 	self assert: resultingEvents isNotNil.
 	self assert: resultingEvents size equals: expectedEvents size.
-	resultingEvents
-		keysAndValuesDo: [ :i :actual | 
-			| expected |
-			expected := expectedEvents at: i.
-			self discardDateCreated: expected.
-			self discardAgent: expected.
-			self assertEvent: expected equals: actual ] ]
-		ensure: [ self restoreEventStores: originalEventStores ]
+	resultingEvents keysAndValuesDo: [ :i :actual | 
+		| expected |
+		expected := expectedEvents at: i.
+		self discardDateCreated: expected.
+		self discardAgent: expected.
+		self assertEvent: expected equals: actual ] ] ensure: [ 
+		self restoreEventStores: originalEventStores ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'test support' }
 EDATDomainBDD >> old_givenAggregate: anAggregateRootSymbol withEvents: historicalEvents whenReceiveCommand: aCommand shouldRaise: anException [
 	| aggregateRoot handlerSelectorSymbol commandClassName |
 	aggregateRoot := (Smalltalk at: anAggregateRootSymbol) new.
@@ -347,6 +367,19 @@ EDATDomainBDD >> retrieveHandlerSelectorSymbol: aCommand [
 				ifEmpty: [ ('handle' , aCommand classNameWithoutPrefix , ':') asSymbol ]
 				ifNotEmpty: [ methods first selector ] ].
 	^ result
+]
+
+{ #category : #'test support' }
+EDATDomainBDD >> setUp [
+
+	edaApplication := self buildEDAApplication.
+]
+
+{ #category : #'test support' }
+EDATDomainBDD >> tearDown [
+
+	EDAApplications uniqueInstance unregister: self edaApplication.
+	self edaApplication: nil
 ]
 
 { #category : #'test support' }

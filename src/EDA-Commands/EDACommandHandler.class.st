@@ -1,8 +1,8 @@
 Class {
 	#name : #EDACommandHandler,
 	#superclass : #Object,
-	#traits : 'EDACPrintOnHelper + EDACLogging + EDACRepository',
-	#classTraits : 'EDACPrintOnHelper classTrait + EDACLogging classTrait + EDACRepository classTrait',
+	#traits : 'EDACPrintOnHelper + EDACLogging + EDACRepository + EDACErrorHelper',
+	#classTraits : 'EDACPrintOnHelper classTrait + EDACLogging classTrait + EDACRepository classTrait + EDACErrorHelper classTrait',
 	#instVars : [
 		'eventStore',
 		'eventBus',

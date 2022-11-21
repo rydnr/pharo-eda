@@ -1,7 +1,7 @@
 Class {
 	#name : #EDAComplexCommandBuilder,
 	#superclass : #EDABaseCommandBuilder,
-	#category : 'EDA-Commands-Tests'
+	#category : #'EDA-Commands-Tests'
 }
 
 { #category : #'as yet unclassified' }
@@ -11,4 +11,9 @@ EDAComplexCommandBuilder >> extractLevels: aCollection [
     result := { } asOrderedCollection.
     aCollection collect: [ :item | result add: (self extractLevel: item) ].
     ^ result
+]
+
+{ #category : #accessing }
+EDAComplexCommandBuilder >> retrieveAggregateRootClass: arg1 [ 
+	^ self shouldBeImplemented
 ]

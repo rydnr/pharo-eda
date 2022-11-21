@@ -3,8 +3,19 @@ Class {
 	#superclass : #Object,
 	#traits : 'EDACLogging',
 	#classTraits : 'EDACLogging classTrait',
+	#instVars : [
+		'edaApplication'
+	],
 	#category : #'EDA-Commands-Materializers'
 }
+
+{ #category : #'instance creation' }
+EDACommandMaterializer class >> forApplication: anEDAApplication [
+
+	^ self new
+		  edaApplication: anEDAApplication;
+		  yourself
+]
 
 { #category : #logging }
 EDACommandMaterializer class >> logDebugMessage: aMessage beautify: aBoolean [
@@ -68,6 +79,18 @@ EDACommandMaterializer >> commandClassForName: aCommandName [
 { #category : #parsing }
 EDACommandMaterializer >> commandClassPrefix [
 	self subclassResponsibility
+]
+
+{ #category : #accessing }
+EDACommandMaterializer >> edaApplication [
+
+	^ edaApplication
+]
+
+{ #category : #accessing }
+EDACommandMaterializer >> edaApplication: anObject [
+
+	edaApplication := anObject
 ]
 
 { #category : #parsing }
