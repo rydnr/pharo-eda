@@ -25,10 +25,10 @@ BaselineOfPharoEDA >> baseline: spec [
 		spec blessing: #baseline.
 		spec postLoadDoIt: #postload:package:.
 		self
+						includePharoEDACommon: spec;
 			includePharoEDACore: spec;
 			includePharoEDAApi: spec;
 			includePharoEDAAdapters: spec;
-			includePharoEDACommon: spec;
 			includePharoEDAPorts: spec;
 			includePharoEDASettings: spec;
 			includePharoEDATools: spec ]
