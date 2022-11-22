@@ -34,36 +34,11 @@ BaselineOfPharoEDA class >> includePharoEDAAdapters: spec [
 ]
 
 { #category : #dependencies }
-BaselineOfPharoEDA class >> includePharoEDAApi: spec [
-
-	spec
-		baseline: 'PharoEDAApi'
-		with: [ spec repository: 'github://rydnr/pharo-eda-api:main' ].
-	^ spec
-]
-
-{ #category : #dependencies }
-BaselineOfPharoEDA class >> includePharoEDACommon: spec [
-spec
-		baseline: 'PharoEDACommon'
-		with: [ spec repository: 'github://rydnr/pharo-eda-common:main' ].
-	^ spec
-]
-
-{ #category : #dependencies }
 BaselineOfPharoEDA class >> includePharoEDACore: spec [
 
 	spec
 		baseline: 'PharoEDACore'
 		with: [ spec repository: 'github://rydnr/pharo-eda-core:main' ].
-	^ spec
-]
-
-{ #category : #dependencies }
-BaselineOfPharoEDA class >> includePharoEDAPorts: spec [
-spec
-		baseline: 'PharoEDAPorts'
-		with: [ spec repository: 'github://rydnr/pharo-eda-ports:main' ].
 	^ spec
 ]
 
