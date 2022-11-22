@@ -65,13 +65,10 @@ BaselineOfPharoEDA >> baseline: spec [
 	spec for: #common do: [ 
 		spec blessing: #baseline.
 		spec postLoadDoIt: #postload:package:.
-		self
-			class includeNeoJSON: spec;
-			includePharoEDACommon: spec;
+		self class
+			includeNeoJSON: spec;
 			includePharoEDACore: spec;
-			includePharoEDAApi: spec;
 			includePharoEDAAdapters: spec;
-			includePharoEDAPorts: spec;
 			includePharoEDASettings: spec;
 			includePharoEDATools: spec ]
 ]
