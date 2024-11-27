@@ -1,1 +1,7 @@
 src/EDA-Settings.package/EDASettings.class/class/customProjectionErrorBehaviorsOn.under.populatedWithValuesFrom..st
+.gradle/
+Pharo.changes
+Pharo.image
+Pharo*.sources
+gradle-local.properties
+image.*

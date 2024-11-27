@@ -1,10 +1,10 @@
-def tag = 'develop'
+def tag = 'master'
 def branchOrTag = "${tag}"
 version = "${tag}-SNAPSHOT" // do not forget to update the version also in docker.gradle
 apply plugin: PharoPlugin
 
 pharo {
-    imageVersion = '80'
+    imageVersion = '100'
 }
 
 def imageName = "${project.name}-${project.version}"
@@ -22,7 +22,7 @@ task downloadFreshImage(type: DownloadPharoImageTask, dependsOn: removePreviousP
 task loadPharoEDA(type: EvalSmalltalkExpressionTask, dependsOn: downloadFreshImage) {
     pharoPath = customPharoPath
     commonPharoArgs = customPharoArgs
-    expression = "Metacello new repository: 'github://osoco/pharo-eda:${branchOrTag}'; baseline: 'PharoEDA'; load"
+    expression = "Metacello new repository: 'github://rydnr/pharo-eda:${branchOrTag}'; baseline: 'PharoEDA'; load"
 }
 
 task customizeImage(type: RunSmalltalkScriptTask, dependsOn: loadPharoEDA) {
